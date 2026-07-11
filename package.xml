@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>v4l2_publisher</name>
+  <version>0.0.1</version>
+  <description>Stereo compressed image publisher using OpenCV and V4L2.</description>
+  <maintainer email="pi@example.com">pi</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+
+  <build_depend>opencv</build_depend>
+  <exec_depend>opencv</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

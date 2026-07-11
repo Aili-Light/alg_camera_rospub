@@ -1,6 +1,6 @@
-# V4L2 Publisher
+# ALG Camera ROS Publisher
 
-ROS2 package for publishing camera images (single or stereo) via V4L2 and IMU data via I2C (ICM-45686).
+ROS2 package `alg_camera_rospub` for publishing camera images (single or stereo) via V4L2 and IMU data via I2C (ICM-45686).
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ ROS2 package for publishing camera images (single or stereo) via V4L2 and IMU da
 
 ```bash
 cd /path/to/alg_cam_rospub
-colcon build --packages-select v4l2_publisher
+colcon build --packages-select alg_camera_rospub
 source install/setup.bash
 ```
 
@@ -32,7 +32,7 @@ All parameters have defaults — only override what you need.
 
 ```bash
 source install/setup.bash
-ros2 launch v4l2_publisher single_camera_with_imu.launch.py \
+ros2 launch alg_camera_rospub single_camera_with_imu.launch.py \
   device_path:=/dev/video0 \
   requested_width:=2560 \
   requested_height:=800 \
@@ -49,7 +49,7 @@ ros2 launch v4l2_publisher single_camera_with_imu.launch.py \
 
 ```bash
 source install/setup.bash
-ros2 launch v4l2_publisher stereo_camera_with_imu.launch.py \
+ros2 launch alg_camera_rospub stereo_camera_with_imu.launch.py \
   left_device_path:=/dev/video0 \
   right_device_path:=/dev/video1 \
   i2c_bus:=/dev/i2c-3
@@ -58,7 +58,7 @@ ros2 launch v4l2_publisher stereo_camera_with_imu.launch.py \
 ### Camera-only (no IMU)
 
 ```bash
-ros2 run v4l2_publisher single_camera_publisher --ros-args \
+ros2 run alg_camera_rospub single_camera_publisher --ros-args \
   -p device_path:=/dev/video0 \
   -p requested_width:=2560 \
   -p requested_height:=800 \
@@ -70,7 +70,7 @@ ros2 run v4l2_publisher single_camera_publisher --ros-args \
 ### IMU-only (no camera)
 
 ```bash
-ros2 run v4l2_publisher imu_publisher --ros-args \
+ros2 run alg_camera_rospub imu_publisher --ros-args \
   -p i2c_bus:=/dev/i2c-3 \
   -p imu_address:=105 \
   -p frequency:=100.0

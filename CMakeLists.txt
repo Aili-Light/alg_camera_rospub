@@ -149,4 +149,9 @@ rclcpp_components_register_nodes(imu_component
   "alg_camera_rospub::ImuNode"
 )
 
+install(PROGRAMS
+  scripts/validate_topics.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()

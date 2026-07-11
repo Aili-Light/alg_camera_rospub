@@ -28,9 +28,11 @@ def generate_launch_description():
         DeclareLaunchArgument('right_topic_name', default_value='/image/right'),
         DeclareLaunchArgument('right_frame_id', default_value='right_camera_link'),
 
-        # --- Rectification ---
-        DeclareLaunchArgument('publish_rectified', default_value='false'),
-        DeclareLaunchArgument('stereo_calib_path', default_value='./stereo_calib.yaml'),
+        # --- Color and compression ---
+        DeclareLaunchArgument('left_output_color', default_value='false'),
+        DeclareLaunchArgument('right_output_color', default_value='false'),
+        DeclareLaunchArgument('publish_compressed', default_value='false'),
+        DeclareLaunchArgument('compressed_quality', default_value='80'),
 
         # --- IMU parameters ---
         DeclareLaunchArgument('i2c_bus', default_value='/dev/i2c-3'),
@@ -58,6 +60,7 @@ def generate_launch_description():
                 'left_fps': LaunchConfiguration('left_fps'),
                 'left_topic_name': LaunchConfiguration('left_topic_name'),
                 'left_frame_id': LaunchConfiguration('left_frame_id'),
+                'left_output_color': LaunchConfiguration('left_output_color'),
                 'right_device_path': LaunchConfiguration('right_device_path'),
                 'right_requested_width': LaunchConfiguration('right_requested_width'),
                 'right_requested_height': LaunchConfiguration('right_requested_height'),
@@ -67,8 +70,9 @@ def generate_launch_description():
                 'right_fps': LaunchConfiguration('right_fps'),
                 'right_topic_name': LaunchConfiguration('right_topic_name'),
                 'right_frame_id': LaunchConfiguration('right_frame_id'),
-                'publish_rectified': LaunchConfiguration('publish_rectified'),
-                'stereo_calib_path': LaunchConfiguration('stereo_calib_path'),
+                'right_output_color': LaunchConfiguration('right_output_color'),
+                'publish_compressed': LaunchConfiguration('publish_compressed'),
+                'compressed_quality': LaunchConfiguration('compressed_quality'),
             }],
         ),
 

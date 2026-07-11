@@ -16,8 +16,9 @@ def generate_launch_description():
         DeclareLaunchArgument('fps', default_value='60.0'),
         DeclareLaunchArgument('topic_name', default_value='/image'),
         DeclareLaunchArgument('frame_id', default_value='camera_link'),
-        DeclareLaunchArgument('publish_rectified', default_value='false'),
-        DeclareLaunchArgument('calib_path', default_value='./camera_calib.yaml'),
+        DeclareLaunchArgument('output_color', default_value='false'),
+        DeclareLaunchArgument('publish_compressed', default_value='false'),
+        DeclareLaunchArgument('compressed_quality', default_value='80'),
 
         # --- IMU parameters ---
         DeclareLaunchArgument('i2c_bus', default_value='/dev/i2c-3'),
@@ -26,7 +27,7 @@ def generate_launch_description():
         DeclareLaunchArgument('imu_topic_name', default_value='imu/data'),
         DeclareLaunchArgument('imu_frame_id', default_value='imu_link'),
 
-        # --- Camera delay (seconds) ---
+        # --- IMU start delay (seconds) ---
         DeclareLaunchArgument('imu_start_delay', default_value='2.0'),
 
         # --- Single camera node (starts immediately) ---
@@ -45,8 +46,9 @@ def generate_launch_description():
                 'fps': LaunchConfiguration('fps'),
                 'topic_name': LaunchConfiguration('topic_name'),
                 'frame_id': LaunchConfiguration('frame_id'),
-                'publish_rectified': LaunchConfiguration('publish_rectified'),
-                'calib_path': LaunchConfiguration('calib_path'),
+                'output_color': LaunchConfiguration('output_color'),
+                'publish_compressed': LaunchConfiguration('publish_compressed'),
+                'compressed_quality': LaunchConfiguration('compressed_quality'),
             }],
         ),
 

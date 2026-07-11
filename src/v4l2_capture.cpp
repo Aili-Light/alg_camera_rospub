@@ -218,8 +218,8 @@ std::optional<cv::Mat> V4L2Capture::grab()
   }
 
   if (!converted) {
-    fprintf(stderr, "[V4L2Capture] %s unsupported pixel format %s\n",
-            config_.device_path.c_str(), active_fourcc_string_.c_str());
+    fprintf(stderr, "[V4L2Capture] %s unsupported pixel format %s (code 0x%08x)\n",
+            config_.device_path.c_str(), active_fourcc_string_.c_str(), active_pixel_format_);
     return std::nullopt;
   }
 
@@ -231,6 +231,12 @@ std::optional<cv::Mat> V4L2Capture::grab()
                         static_cast<int>(config_.target_height)),
                0.0, 0.0, cv::INTER_LINEAR);
     output_frame = resized;
+  }
+
+  // Fallback: if we got here and the frame is empty (luma extraction succeeded
+  // but produced no data), return nullopt.
+  if (output_frame.empty()) {
+    return std::nullopt;
   }
 
   ++publish_count_;

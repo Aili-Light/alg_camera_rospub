@@ -183,7 +183,8 @@ def main():
             rclpy.spin_once(recorder, timeout_sec=0.1)
             if args.duration > 0 and (
                     time.monotonic() - start_time) >= args.duration:
-                running = False
+                shutdown()
+                break
     except KeyboardInterrupt:
         pass
     finally:

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libv4l2_capture.a CMakeFiles/v4l2_capture.dir/src/v4l2_capture.cpp.o CMakeFiles/v4l2_capture.dir/src/clock_offset.cpp.o CMakeFiles/v4l2_capture.dir/src/rectification.cpp.o
+/usr/bin/ranlib libv4l2_capture.a

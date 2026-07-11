@@ -120,6 +120,8 @@ ImuNode::ImuNode(const rclcpp::NodeOptions & options)
 {
 }
 
+ImuNode::~ImuNode() = default;
+
 }  // namespace v4l2_publisher
 
 #include <rclcpp_components/register_node_macro.hpp>

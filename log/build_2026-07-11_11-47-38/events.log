@@ -1,0 +1,369 @@
+[0.000000] (-) TimerEvent: {}
+[0.000290] (v4l2_publisher) JobQueued: {'identifier': 'v4l2_publisher', 'dependencies': OrderedDict()}
+[0.000428] (v4l2_publisher) JobStarted: {'identifier': 'v4l2_publisher'}
+[0.017721] (v4l2_publisher) JobProgress: {'identifier': 'v4l2_publisher', 'progress': 'cmake'}
+[0.019621] (v4l2_publisher) Command: {'cmd': ['/usr/bin/cmake', '/home/pi/workspace/alg_cam_rospub', '-DCMAKE_INSTALL_PREFIX=/home/pi/workspace/alg_cam_rospub/install/v4l2_publisher'], 'cwd': '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('VSCODE_CWD', '/home/pi'), ('VSCODE_ESM_ENTRYPOINT', 'vs/workbench/api/node/extensionHostProcess'), ('AI_AGENT', 'claude-code_2-1-207_agent'), ('ANTHROPIC_DEFAULT_SONNET_MODEL_NAME', 'deepseek-v4-pro'), ('USER', 'pi'), ('SSH_CLIENT', '192.168.1.81 54176 22'), ('CLAUDE_CODE_ENTRYPOINT', 'claude-vscode'), ('LC_TIME', 'C.UTF-8'), ('VSCODE_NLS_CONFIG', '{"userLocale":"en","osLocale":"en","resolvedLanguage":"en","defaultMessagesFile":"/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/out/nls.messages.json","locale":"en","availableLanguages":{}}'), ('GIT_EDITOR', 'true'), ('VSCODE_HANDLES_UNCAUGHT_ERRORS', 'true'), ('XDG_SESSION_TYPE', 'tty'), ('CLAUDE_AGENT_SDK_VERSION', '0.3.207'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('BROWSER', '/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/bin/helpers/browser.sh'), ('MOTD_SHOWN', 'pam'), ('HOME', '/home/pi'), ('OLDPWD', '/home/pi/.vscode-server'), ('VSCODE_RECONNECTION_GRACE_TIME', '10800000'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-097ba4dd-4e4e-4448-afaa-96cefb1eac2a.sock'), ('ANTHROPIC_DEFAULT_SONNET_MODEL', 'claude-sonnet-4-6'), ('ROS_PYTHON_VERSION', '3'), ('CLAUDE_CODE_CHILD_SESSION', '1'), ('LC_MONETARY', 'C.UTF-8'), ('COPILOT_OTEL_FILE_EXPORTER_PATH', '/dev/null'), ('LC_CTYPE', 'C.UTF-8'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('VSCODE_L10N_BUNDLE_LOCATION', ''), ('ANTHROPIC_DEFAULT_OPUS_MODEL_NAME', 'deepseek-v4-pro'), ('APPLICATION_INSIGHTS_NO_STATSBEAT', 'true'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'pi'), ('VSCODE_HANDLES_SIGPIPE', 'true'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('ANTHROPIC_BASE_URL', 'http://127.0.0.1:15721'), ('ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME', 'deepseek-v4-pro'), ('XDG_SESSION_ID', '5'), ('VSCODE_CLI_REQUIRE_TOKEN', 'd48a8398-9479-4c5c-a6f9-4e6f58a0b15a'), ('ROS_LOCALHOST_ONLY', '0'), ('ANTHROPIC_DEFAULT_OPUS_MODEL', 'claude-opus-4-8'), ('MCP_CONNECTION_NONBLOCKING', 'true'), ('PATH', '/home/pi/.local/bin:/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/bin/remote-cli:/home/pi/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('VSCODE_AGENT_FOLDER', '/home/pi/.vscode-server'), ('PAPERSIZE', 'a4'), ('COREPACK_ENABLE_AUTO_PIN', '0'), ('LC_ADDRESS', 'C.UTF-8'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('CLAUDE_EFFORT', 'high'), ('NoDefaultCurrentDirectoryInExePath', '1'), ('LC_TELEPHONE', 'C.UTF-8'), ('ANTHROPIC_DEFAULT_HAIKU_MODEL', 'claude-haiku-4-5'), ('LS_COLORS', ''), ('ROS_DOMAIN_ID', '7'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'C.UTF-8'), ('ANTHROPIC_AUTH_TOKEN', 'PROXY_MANAGED'), ('MXC_BIN_DIR', '/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/node_modules/@microsoft/mxc-sdk/bin'), ('ELECTRON_RUN_AS_NODE', '1'), ('CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING', 'true'), ('CLAUDE_CODE_SESSION_ID', 'cfd8102a-c416-4172-bd40-bd63b697b182'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CLAUDECODE', '1'), ('LC_MEASUREMENT', 'C.UTF-8'), ('LC_IDENTIFICATION', 'C.UTF-8'), ('PWD', '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher'), ('SSH_CONNECTION', '192.168.1.81 54176 192.168.1.17 22'), ('CLAUDE_CODE_EXECPATH', '/home/pi/.vscode-server/extensions/anthropic.claude-code-2.1.207-linux-arm64/resources/native-binary/claude'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'C.UTF-8'), ('CLAUDE_CODE_ENABLE_TASKS', '0'), ('LC_PAPER', 'C.UTF-8'), ('COLCON', '1'), ('COPILOT_CLI_ENABLED_FEATURE_FLAGS', 'SHELL_SPAWN_BACKEND'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[0.098515] (-) TimerEvent: {}
+[0.199081] (-) TimerEvent: {}
+[0.237147] (v4l2_publisher) StdoutLine: {'line': b'-- The C compiler identification is GNU 11.4.0\n'}
+[0.299310] (-) TimerEvent: {}
+[0.401275] (-) TimerEvent: {}
+[0.427239] (v4l2_publisher) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 11.4.0\n'}
+[0.457168] (v4l2_publisher) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.501673] (-) TimerEvent: {}
+[0.602221] (-) TimerEvent: {}
+[0.702907] (-) TimerEvent: {}
+[0.718613] (v4l2_publisher) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.732153] (v4l2_publisher) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[0.732850] (v4l2_publisher) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.733280] (v4l2_publisher) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.739121] (v4l2_publisher) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.803185] (-) TimerEvent: {}
+[0.903610] (-) TimerEvent: {}
+[1.004070] (-) TimerEvent: {}
+[1.012149] (v4l2_publisher) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[1.051336] (v4l2_publisher) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[1.052647] (v4l2_publisher) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[1.054444] (v4l2_publisher) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[1.068234] (v4l2_publisher) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[1.104376] (-) TimerEvent: {}
+[1.204811] (-) TimerEvent: {}
+[1.305826] (-) TimerEvent: {}
+[1.406252] (-) TimerEvent: {}
+[1.506691] (-) TimerEvent: {}
+[1.607368] (-) TimerEvent: {}
+[1.708025] (-) TimerEvent: {}
+[1.808580] (-) TimerEvent: {}
+[1.896597] (v4l2_publisher) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter \n'}
+[1.908886] (-) TimerEvent: {}
+[2.009465] (-) TimerEvent: {}
+[2.106432] (v4l2_publisher) StdoutLine: {'line': b'-- Found rclcpp: 16.0.19 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[2.109552] (-) TimerEvent: {}
+[2.176260] (v4l2_publisher) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.8 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[2.181334] (v4l2_publisher) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.8 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[2.191845] (v4l2_publisher) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.8 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[2.207893] (v4l2_publisher) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[2.209687] (-) TimerEvent: {}
+[2.228971] (v4l2_publisher) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[2.287157] (v4l2_publisher) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[2.289882] (v4l2_publisher) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.10 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[2.309997] (-) TimerEvent: {}
+[2.410483] (-) TimerEvent: {}
+[2.503386] (v4l2_publisher) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.2")  \n'}
+[2.510648] (-) TimerEvent: {}
+[2.564426] (v4l2_publisher) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/humble/include  \n'}
+[2.610911] (-) TimerEvent: {}
+[2.662929] (v4l2_publisher) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[2.677180] (v4l2_publisher) StdoutLine: {'line': b'-- Looking for pthread.h\n'}
+[2.711235] (-) TimerEvent: {}
+[2.811979] (-) TimerEvent: {}
+[2.912622] (-) TimerEvent: {}
+[2.947572] (v4l2_publisher) StdoutLine: {'line': b'-- Looking for pthread.h - found\n'}
+[2.948414] (v4l2_publisher) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[3.012893] (-) TimerEvent: {}
+[3.113541] (-) TimerEvent: {}
+[3.202776] (v4l2_publisher) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success\n'}
+[3.204669] (v4l2_publisher) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[3.213787] (-) TimerEvent: {}
+[3.284489] (v4l2_publisher) StdoutLine: {'line': b'-- Found rclcpp_components: 16.0.19 (/opt/ros/humble/share/rclcpp_components/cmake)\n'}
+[3.314131] (-) TimerEvent: {}
+[3.328872] (v4l2_publisher) StdoutLine: {'line': b'-- Found sensor_msgs: 4.9.1 (/opt/ros/humble/share/sensor_msgs/cmake)\n'}
+[3.388299] (v4l2_publisher) StdoutLine: {'line': b'-- Found OpenCV: /usr (found version "4.5.4") \n'}
+[3.414331] (-) TimerEvent: {}
+[3.515020] (-) TimerEvent: {}
+[3.555556] (v4l2_publisher) StdoutLine: {'line': b'-- Configuring done\n'}
+[3.615274] (-) TimerEvent: {}
+[3.643584] (v4l2_publisher) StdoutLine: {'line': b'-- Generating done\n'}
+[3.671826] (v4l2_publisher) StdoutLine: {'line': b'-- Build files have been written to: /home/pi/workspace/alg_cam_rospub/build/v4l2_publisher\n'}
+[3.699134] (v4l2_publisher) CommandEnded: {'returncode': 0}
+[3.703649] (v4l2_publisher) JobProgress: {'identifier': 'v4l2_publisher', 'progress': 'build'}
+[3.704804] (v4l2_publisher) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher', '--', '-j8', '-l8'], 'cwd': '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('VSCODE_CWD', '/home/pi'), ('VSCODE_ESM_ENTRYPOINT', 'vs/workbench/api/node/extensionHostProcess'), ('AI_AGENT', 'claude-code_2-1-207_agent'), ('ANTHROPIC_DEFAULT_SONNET_MODEL_NAME', 'deepseek-v4-pro'), ('USER', 'pi'), ('SSH_CLIENT', '192.168.1.81 54176 22'), ('CLAUDE_CODE_ENTRYPOINT', 'claude-vscode'), ('LC_TIME', 'C.UTF-8'), ('VSCODE_NLS_CONFIG', '{"userLocale":"en","osLocale":"en","resolvedLanguage":"en","defaultMessagesFile":"/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/out/nls.messages.json","locale":"en","availableLanguages":{}}'), ('GIT_EDITOR', 'true'), ('VSCODE_HANDLES_UNCAUGHT_ERRORS', 'true'), ('XDG_SESSION_TYPE', 'tty'), ('CLAUDE_AGENT_SDK_VERSION', '0.3.207'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('BROWSER', '/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/bin/helpers/browser.sh'), ('MOTD_SHOWN', 'pam'), ('HOME', '/home/pi'), ('OLDPWD', '/home/pi/.vscode-server'), ('VSCODE_RECONNECTION_GRACE_TIME', '10800000'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-097ba4dd-4e4e-4448-afaa-96cefb1eac2a.sock'), ('ANTHROPIC_DEFAULT_SONNET_MODEL', 'claude-sonnet-4-6'), ('ROS_PYTHON_VERSION', '3'), ('CLAUDE_CODE_CHILD_SESSION', '1'), ('LC_MONETARY', 'C.UTF-8'), ('COPILOT_OTEL_FILE_EXPORTER_PATH', '/dev/null'), ('LC_CTYPE', 'C.UTF-8'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('VSCODE_L10N_BUNDLE_LOCATION', ''), ('ANTHROPIC_DEFAULT_OPUS_MODEL_NAME', 'deepseek-v4-pro'), ('APPLICATION_INSIGHTS_NO_STATSBEAT', 'true'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'pi'), ('VSCODE_HANDLES_SIGPIPE', 'true'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('ANTHROPIC_BASE_URL', 'http://127.0.0.1:15721'), ('ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME', 'deepseek-v4-pro'), ('XDG_SESSION_ID', '5'), ('VSCODE_CLI_REQUIRE_TOKEN', 'd48a8398-9479-4c5c-a6f9-4e6f58a0b15a'), ('ROS_LOCALHOST_ONLY', '0'), ('ANTHROPIC_DEFAULT_OPUS_MODEL', 'claude-opus-4-8'), ('MCP_CONNECTION_NONBLOCKING', 'true'), ('PATH', '/home/pi/.local/bin:/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/bin/remote-cli:/home/pi/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('VSCODE_AGENT_FOLDER', '/home/pi/.vscode-server'), ('PAPERSIZE', 'a4'), ('COREPACK_ENABLE_AUTO_PIN', '0'), ('LC_ADDRESS', 'C.UTF-8'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('CLAUDE_EFFORT', 'high'), ('NoDefaultCurrentDirectoryInExePath', '1'), ('LC_TELEPHONE', 'C.UTF-8'), ('ANTHROPIC_DEFAULT_HAIKU_MODEL', 'claude-haiku-4-5'), ('LS_COLORS', ''), ('ROS_DOMAIN_ID', '7'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'C.UTF-8'), ('ANTHROPIC_AUTH_TOKEN', 'PROXY_MANAGED'), ('MXC_BIN_DIR', '/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/node_modules/@microsoft/mxc-sdk/bin'), ('ELECTRON_RUN_AS_NODE', '1'), ('CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING', 'true'), ('CLAUDE_CODE_SESSION_ID', 'cfd8102a-c416-4172-bd40-bd63b697b182'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CLAUDECODE', '1'), ('LC_MEASUREMENT', 'C.UTF-8'), ('LC_IDENTIFICATION', 'C.UTF-8'), ('PWD', '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher'), ('SSH_CONNECTION', '192.168.1.81 54176 192.168.1.17 22'), ('CLAUDE_CODE_EXECPATH', '/home/pi/.vscode-server/extensions/anthropic.claude-code-2.1.207-linux-arm64/resources/native-binary/claude'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'C.UTF-8'), ('CLAUDE_CODE_ENABLE_TASKS', '0'), ('LC_PAPER', 'C.UTF-8'), ('COLCON', '1'), ('COPILOT_CLI_ENABLED_FEATURE_FLAGS', 'SHELL_SPAWN_BACKEND'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[3.715401] (-) TimerEvent: {}
+[3.815994] (-) TimerEvent: {}
+[3.870182] (v4l2_publisher) StdoutLine: {'line': b'[  5%] Building CXX object CMakeFiles/v4l2_capture.dir/src/v4l2_capture.cpp.o\n'}
+[3.878895] (v4l2_publisher) StdoutLine: {'line': b'[ 10%] Building CXX object CMakeFiles/v4l2_capture.dir/src/rectification.cpp.o\n'}
+[3.881516] (v4l2_publisher) StdoutLine: {'line': b'[ 15%] Building CXX object CMakeFiles/v4l2_capture.dir/src/clock_offset.cpp.o\n'}
+[3.911349] (v4l2_publisher) StdoutLine: {'line': b'[ 20%] Building CXX object CMakeFiles/i2c_imu.dir/src/imu_device.cpp.o\n'}
+[3.913996] (v4l2_publisher) StdoutLine: {'line': b'[ 30%] Building C object CMakeFiles/i2c_imu.dir/src/i2c_drive_linux.c.o\n'}
+[3.915166] (v4l2_publisher) StdoutLine: {'line': b'[ 30%] Building CXX object CMakeFiles/i2c_imu.dir/src/imu_icm_45686.cpp.o\n'}
+[3.915954] (-) TimerEvent: {}
+[4.003982] (v4l2_publisher) StderrLine: {'line': b'/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c: In function \xe2\x80\x98i2c_transformer\xe2\x80\x99:\n'}
+[4.005698] (v4l2_publisher) StderrLine: {'line': b'/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c:25:18: warning: unused variable \xe2\x80\x98idx\xe2\x80\x99 [-Wunused-variable]\n'}
+[4.006321] (v4l2_publisher) StderrLine: {'line': b'   25 |     unsigned int idx;\n'}
+[4.006837] (v4l2_publisher) StderrLine: {'line': b'      |                  ^~~\n'}
+[4.007348] (v4l2_publisher) StderrLine: {'line': b'/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c: In function \xe2\x80\x98i2c_write_0808\xe2\x80\x99:\n'}
+[4.007810] (v4l2_publisher) StderrLine: {'line': b'/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c:88:78: warning: unused parameter \xe2\x80\x98dat\xe2\x80\x99 [-Wunused-parameter]\n'}
+[4.008246] (v4l2_publisher) StderrLine: {'line': b'   88 | int i2c_write_0808(uint8_t i2c_bus_index, uint8_t addr, uint8_t reg, uint8_t dat)\n'}
+[4.008635] (v4l2_publisher) StderrLine: {'line': b'      |                                                                      ~~~~~~~~^~~\n'}
+[4.009003] (v4l2_publisher) StderrLine: {'line': b'/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c: In function \xe2\x80\x98hal_i2c_linux_transformer\xe2\x80\x99:\n'}
+[4.009361] (v4l2_publisher) StderrLine: {'line': b'/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c:152:18: warning: unused variable \xe2\x80\x98idx\xe2\x80\x99 [-Wunused-variable]\n'}
+[4.009740] (v4l2_publisher) StderrLine: {'line': b'  152 |     unsigned int idx;\n'}
+[4.010075] (v4l2_publisher) StderrLine: {'line': b'      |                  ^~~\n'}
+[4.016192] (-) TimerEvent: {}
+[4.116838] (-) TimerEvent: {}
+[4.217455] (-) TimerEvent: {}
+[4.294871] (v4l2_publisher) StdoutLine: {'line': b'[ 35%] Linking CXX static library libi2c_imu.a\n'}
+[4.317575] (-) TimerEvent: {}
+[4.395692] (v4l2_publisher) StdoutLine: {'line': b'[ 35%] Built target i2c_imu\n'}
+[4.417821] (-) TimerEvent: {}
+[4.518330] (-) TimerEvent: {}
+[4.618741] (-) TimerEvent: {}
+[4.719070] (-) TimerEvent: {}
+[4.819452] (-) TimerEvent: {}
+[4.919837] (-) TimerEvent: {}
+[5.020297] (-) TimerEvent: {}
+[5.120706] (-) TimerEvent: {}
+[5.221091] (-) TimerEvent: {}
+[5.321475] (-) TimerEvent: {}
+[5.421882] (-) TimerEvent: {}
+[5.522334] (-) TimerEvent: {}
+[5.622733] (-) TimerEvent: {}
+[5.723166] (-) TimerEvent: {}
+[5.823568] (-) TimerEvent: {}
+[5.923980] (-) TimerEvent: {}
+[6.024364] (-) TimerEvent: {}
+[6.124699] (-) TimerEvent: {}
+[6.153793] (v4l2_publisher) StdoutLine: {'line': b'[ 40%] Linking CXX static library libv4l2_capture.a\n'}
+[6.224966] (-) TimerEvent: {}
+[6.286483] (v4l2_publisher) StdoutLine: {'line': b'[ 40%] Built target v4l2_capture\n'}
+[6.325157] (-) TimerEvent: {}
+[6.334998] (v4l2_publisher) StdoutLine: {'line': b'[ 45%] Building CXX object CMakeFiles/imu_component.dir/src/imu_node.cpp.o\n'}
+[6.346015] (v4l2_publisher) StdoutLine: {'line': b'[ 50%] Building CXX object CMakeFiles/stereo_camera_component.dir/src/stereo_camera_node.cpp.o\n'}
+[6.362876] (v4l2_publisher) StdoutLine: {'line': b'[ 55%] Building CXX object CMakeFiles/single_camera_component.dir/src/single_camera_node.cpp.o\n'}
+[6.425477] (-) TimerEvent: {}
+[6.526170] (-) TimerEvent: {}
+[6.626947] (-) TimerEvent: {}
+[6.727747] (-) TimerEvent: {}
+[6.828500] (-) TimerEvent: {}
+[6.929293] (-) TimerEvent: {}
+[7.030014] (-) TimerEvent: {}
+[7.130943] (-) TimerEvent: {}
+[7.231687] (-) TimerEvent: {}
+[7.332455] (-) TimerEvent: {}
+[7.433332] (-) TimerEvent: {}
+[7.534000] (-) TimerEvent: {}
+[7.634437] (-) TimerEvent: {}
+[7.734839] (-) TimerEvent: {}
+[7.835257] (-) TimerEvent: {}
+[7.935686] (-) TimerEvent: {}
+[8.036095] (-) TimerEvent: {}
+[8.136518] (-) TimerEvent: {}
+[8.236946] (-) TimerEvent: {}
+[8.337790] (-) TimerEvent: {}
+[8.438712] (-) TimerEvent: {}
+[8.539442] (-) TimerEvent: {}
+[8.639939] (-) TimerEvent: {}
+[8.740627] (-) TimerEvent: {}
+[8.841299] (-) TimerEvent: {}
+[8.941968] (-) TimerEvent: {}
+[9.042601] (-) TimerEvent: {}
+[9.143249] (-) TimerEvent: {}
+[9.243798] (-) TimerEvent: {}
+[9.344526] (-) TimerEvent: {}
+[9.445204] (-) TimerEvent: {}
+[9.545875] (-) TimerEvent: {}
+[9.646549] (-) TimerEvent: {}
+[9.747193] (-) TimerEvent: {}
+[9.847916] (-) TimerEvent: {}
+[9.948580] (-) TimerEvent: {}
+[10.049129] (-) TimerEvent: {}
+[10.149748] (-) TimerEvent: {}
+[10.250444] (-) TimerEvent: {}
+[10.351090] (-) TimerEvent: {}
+[10.451733] (-) TimerEvent: {}
+[10.552334] (-) TimerEvent: {}
+[10.652954] (-) TimerEvent: {}
+[10.753566] (-) TimerEvent: {}
+[10.854217] (-) TimerEvent: {}
+[10.954884] (-) TimerEvent: {}
+[11.055579] (-) TimerEvent: {}
+[11.156231] (-) TimerEvent: {}
+[11.256800] (-) TimerEvent: {}
+[11.357467] (-) TimerEvent: {}
+[11.458132] (-) TimerEvent: {}
+[11.558754] (-) TimerEvent: {}
+[11.659397] (-) TimerEvent: {}
+[11.760116] (-) TimerEvent: {}
+[11.861037] (-) TimerEvent: {}
+[11.961942] (-) TimerEvent: {}
+[12.062938] (-) TimerEvent: {}
+[12.163960] (-) TimerEvent: {}
+[12.264798] (-) TimerEvent: {}
+[12.365545] (-) TimerEvent: {}
+[12.466028] (-) TimerEvent: {}
+[12.566495] (-) TimerEvent: {}
+[12.667029] (-) TimerEvent: {}
+[12.767657] (-) TimerEvent: {}
+[12.868324] (-) TimerEvent: {}
+[12.968954] (-) TimerEvent: {}
+[13.069570] (-) TimerEvent: {}
+[13.170198] (-) TimerEvent: {}
+[13.270831] (-) TimerEvent: {}
+[13.371329] (-) TimerEvent: {}
+[13.471927] (-) TimerEvent: {}
+[13.572448] (-) TimerEvent: {}
+[13.672942] (-) TimerEvent: {}
+[13.773541] (-) TimerEvent: {}
+[13.874136] (-) TimerEvent: {}
+[13.974759] (-) TimerEvent: {}
+[14.075355] (-) TimerEvent: {}
+[14.176004] (-) TimerEvent: {}
+[14.276834] (-) TimerEvent: {}
+[14.377483] (-) TimerEvent: {}
+[14.477986] (-) TimerEvent: {}
+[14.566282] (v4l2_publisher) StdoutLine: {'line': b'[ 60%] Linking CXX shared library libimu_component.so\n'}
+[14.578210] (-) TimerEvent: {}
+[14.678757] (-) TimerEvent: {}
+[14.779294] (-) TimerEvent: {}
+[14.879887] (-) TimerEvent: {}
+[14.980501] (-) TimerEvent: {}
+[15.081016] (-) TimerEvent: {}
+[15.181520] (-) TimerEvent: {}
+[15.218548] (v4l2_publisher) StdoutLine: {'line': b'[ 60%] Built target imu_component\n'}
+[15.281752] (-) TimerEvent: {}
+[15.288824] (v4l2_publisher) StdoutLine: {'line': b'[ 65%] Building CXX object CMakeFiles/imu_publisher.dir/src/imu_main.cpp.o\n'}
+[15.381961] (-) TimerEvent: {}
+[15.482518] (-) TimerEvent: {}
+[15.583183] (-) TimerEvent: {}
+[15.683915] (-) TimerEvent: {}
+[15.784656] (-) TimerEvent: {}
+[15.885281] (-) TimerEvent: {}
+[15.985769] (-) TimerEvent: {}
+[16.086280] (-) TimerEvent: {}
+[16.162337] (v4l2_publisher) StdoutLine: {'line': b'[ 70%] Linking CXX shared library libsingle_camera_component.so\n'}
+[16.186605] (-) TimerEvent: {}
+[16.287360] (-) TimerEvent: {}
+[16.352195] (v4l2_publisher) StdoutLine: {'line': b'[ 75%] Linking CXX shared library libstereo_camera_component.so\n'}
+[16.387722] (-) TimerEvent: {}
+[16.488468] (-) TimerEvent: {}
+[16.589307] (-) TimerEvent: {}
+[16.690056] (-) TimerEvent: {}
+[16.790651] (-) TimerEvent: {}
+[16.850064] (v4l2_publisher) StdoutLine: {'line': b'[ 75%] Built target single_camera_component\n'}
+[16.890874] (-) TimerEvent: {}
+[16.915653] (v4l2_publisher) StdoutLine: {'line': b'[ 80%] Building CXX object CMakeFiles/single_camera_publisher.dir/src/single_camera_main.cpp.o\n'}
+[16.991169] (-) TimerEvent: {}
+[17.045417] (v4l2_publisher) StdoutLine: {'line': b'[ 80%] Built target stereo_camera_component\n'}
+[17.091496] (-) TimerEvent: {}
+[17.121780] (v4l2_publisher) StdoutLine: {'line': b'[ 85%] Building CXX object CMakeFiles/stereo_camera_publisher.dir/src/stereo_camera_main.cpp.o\n'}
+[17.191770] (-) TimerEvent: {}
+[17.292457] (-) TimerEvent: {}
+[17.393353] (-) TimerEvent: {}
+[17.494127] (-) TimerEvent: {}
+[17.594852] (-) TimerEvent: {}
+[17.695601] (-) TimerEvent: {}
+[17.796425] (-) TimerEvent: {}
+[17.897396] (-) TimerEvent: {}
+[17.998333] (-) TimerEvent: {}
+[18.099205] (-) TimerEvent: {}
+[18.200026] (-) TimerEvent: {}
+[18.300935] (-) TimerEvent: {}
+[18.401636] (-) TimerEvent: {}
+[18.502153] (-) TimerEvent: {}
+[18.602814] (-) TimerEvent: {}
+[18.703461] (-) TimerEvent: {}
+[18.804205] (-) TimerEvent: {}
+[18.904755] (-) TimerEvent: {}
+[19.005286] (-) TimerEvent: {}
+[19.105900] (-) TimerEvent: {}
+[19.206452] (-) TimerEvent: {}
+[19.307076] (-) TimerEvent: {}
+[19.407716] (-) TimerEvent: {}
+[19.508258] (-) TimerEvent: {}
+[19.608888] (-) TimerEvent: {}
+[19.709509] (-) TimerEvent: {}
+[19.810165] (-) TimerEvent: {}
+[19.910801] (-) TimerEvent: {}
+[20.011355] (-) TimerEvent: {}
+[20.111894] (-) TimerEvent: {}
+[20.212445] (-) TimerEvent: {}
+[20.313044] (-) TimerEvent: {}
+[20.413697] (-) TimerEvent: {}
+[20.514277] (-) TimerEvent: {}
+[20.614823] (-) TimerEvent: {}
+[20.715315] (-) TimerEvent: {}
+[20.782869] (v4l2_publisher) StdoutLine: {'line': b'[ 90%] Linking CXX executable imu_publisher\n'}
+[20.815528] (-) TimerEvent: {}
+[20.916171] (-) TimerEvent: {}
+[21.016896] (-) TimerEvent: {}
+[21.117536] (-) TimerEvent: {}
+[21.218123] (-) TimerEvent: {}
+[21.222953] (v4l2_publisher) StdoutLine: {'line': b'[ 90%] Built target imu_publisher\n'}
+[21.318334] (-) TimerEvent: {}
+[21.419085] (-) TimerEvent: {}
+[21.519908] (-) TimerEvent: {}
+[21.620911] (-) TimerEvent: {}
+[21.721903] (-) TimerEvent: {}
+[21.822689] (-) TimerEvent: {}
+[21.923396] (-) TimerEvent: {}
+[22.024161] (-) TimerEvent: {}
+[22.110245] (v4l2_publisher) StdoutLine: {'line': b'[ 95%] Linking CXX executable single_camera_publisher\n'}
+[22.124490] (-) TimerEvent: {}
+[22.225374] (-) TimerEvent: {}
+[22.326120] (-) TimerEvent: {}
+[22.426717] (-) TimerEvent: {}
+[22.527328] (-) TimerEvent: {}
+[22.561351] (v4l2_publisher) StdoutLine: {'line': b'[ 95%] Built target single_camera_publisher\n'}
+[22.616616] (v4l2_publisher) StdoutLine: {'line': b'[100%] Linking CXX executable stereo_camera_publisher\n'}
+[22.627501] (-) TimerEvent: {}
+[22.728231] (-) TimerEvent: {}
+[22.829076] (-) TimerEvent: {}
+[22.929866] (-) TimerEvent: {}
+[23.030688] (-) TimerEvent: {}
+[23.131378] (-) TimerEvent: {}
+[23.150125] (v4l2_publisher) StdoutLine: {'line': b'[100%] Built target stereo_camera_publisher\n'}
+[23.207356] (v4l2_publisher) CommandEnded: {'returncode': 0}
+[23.211236] (v4l2_publisher) JobProgress: {'identifier': 'v4l2_publisher', 'progress': 'install'}
+[23.231618] (-) TimerEvent: {}
+[23.249108] (v4l2_publisher) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher'], 'cwd': '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('VSCODE_CWD', '/home/pi'), ('VSCODE_ESM_ENTRYPOINT', 'vs/workbench/api/node/extensionHostProcess'), ('AI_AGENT', 'claude-code_2-1-207_agent'), ('ANTHROPIC_DEFAULT_SONNET_MODEL_NAME', 'deepseek-v4-pro'), ('USER', 'pi'), ('SSH_CLIENT', '192.168.1.81 54176 22'), ('CLAUDE_CODE_ENTRYPOINT', 'claude-vscode'), ('LC_TIME', 'C.UTF-8'), ('VSCODE_NLS_CONFIG', '{"userLocale":"en","osLocale":"en","resolvedLanguage":"en","defaultMessagesFile":"/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/out/nls.messages.json","locale":"en","availableLanguages":{}}'), ('GIT_EDITOR', 'true'), ('VSCODE_HANDLES_UNCAUGHT_ERRORS', 'true'), ('XDG_SESSION_TYPE', 'tty'), ('CLAUDE_AGENT_SDK_VERSION', '0.3.207'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib'), ('BROWSER', '/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/bin/helpers/browser.sh'), ('MOTD_SHOWN', 'pam'), ('HOME', '/home/pi'), ('OLDPWD', '/home/pi/.vscode-server'), ('VSCODE_RECONNECTION_GRACE_TIME', '10800000'), ('VSCODE_IPC_HOOK_CLI', '/run/user/1000/vscode-ipc-097ba4dd-4e4e-4448-afaa-96cefb1eac2a.sock'), ('ANTHROPIC_DEFAULT_SONNET_MODEL', 'claude-sonnet-4-6'), ('ROS_PYTHON_VERSION', '3'), ('CLAUDE_CODE_CHILD_SESSION', '1'), ('LC_MONETARY', 'C.UTF-8'), ('COPILOT_OTEL_FILE_EXPORTER_PATH', '/dev/null'), ('LC_CTYPE', 'C.UTF-8'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('VSCODE_L10N_BUNDLE_LOCATION', ''), ('ANTHROPIC_DEFAULT_OPUS_MODEL_NAME', 'deepseek-v4-pro'), ('APPLICATION_INSIGHTS_NO_STATSBEAT', 'true'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'pi'), ('VSCODE_HANDLES_SIGPIPE', 'true'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('ANTHROPIC_BASE_URL', 'http://127.0.0.1:15721'), ('ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME', 'deepseek-v4-pro'), ('XDG_SESSION_ID', '5'), ('VSCODE_CLI_REQUIRE_TOKEN', 'd48a8398-9479-4c5c-a6f9-4e6f58a0b15a'), ('ROS_LOCALHOST_ONLY', '0'), ('ANTHROPIC_DEFAULT_OPUS_MODEL', 'claude-opus-4-8'), ('MCP_CONNECTION_NONBLOCKING', 'true'), ('PATH', '/home/pi/.local/bin:/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/bin/remote-cli:/home/pi/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('VSCODE_AGENT_FOLDER', '/home/pi/.vscode-server'), ('PAPERSIZE', 'a4'), ('COREPACK_ENABLE_AUTO_PIN', '0'), ('LC_ADDRESS', 'C.UTF-8'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('CLAUDE_EFFORT', 'high'), ('NoDefaultCurrentDirectoryInExePath', '1'), ('LC_TELEPHONE', 'C.UTF-8'), ('ANTHROPIC_DEFAULT_HAIKU_MODEL', 'claude-haiku-4-5'), ('LS_COLORS', ''), ('ROS_DOMAIN_ID', '7'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'C.UTF-8'), ('ANTHROPIC_AUTH_TOKEN', 'PROXY_MANAGED'), ('MXC_BIN_DIR', '/home/pi/.vscode-server/cli/servers/Stable-fc3def6774c76082adf699d366f31a557ce5573f/server/node_modules/@microsoft/mxc-sdk/bin'), ('ELECTRON_RUN_AS_NODE', '1'), ('CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING', 'true'), ('CLAUDE_CODE_SESSION_ID', 'cfd8102a-c416-4172-bd40-bd63b697b182'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CLAUDECODE', '1'), ('LC_MEASUREMENT', 'C.UTF-8'), ('LC_IDENTIFICATION', 'C.UTF-8'), ('PWD', '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher'), ('SSH_CONNECTION', '192.168.1.81 54176 192.168.1.17 22'), ('CLAUDE_CODE_EXECPATH', '/home/pi/.vscode-server/extensions/anthropic.claude-code-2.1.207-linux-arm64/resources/native-binary/claude'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('LC_NUMERIC', 'C.UTF-8'), ('CLAUDE_CODE_ENABLE_TASKS', '0'), ('LC_PAPER', 'C.UTF-8'), ('COLCON', '1'), ('COPILOT_CLI_ENABLED_FEATURE_FLAGS', 'SHELL_SPAWN_BACKEND'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[23.287801] (v4l2_publisher) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[23.289361] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/libv4l2_capture.a\n'}
+[23.295809] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/libi2c_imu.a\n'}
+[23.296883] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/libsingle_camera_component.so\n'}
+[23.305217] (v4l2_publisher) StdoutLine: {'line': b'-- Set runtime path of "/home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/libsingle_camera_component.so" to ""\n'}
+[23.305960] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/libstereo_camera_component.so\n'}
+[23.313008] (v4l2_publisher) StdoutLine: {'line': b'-- Set runtime path of "/home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/libstereo_camera_component.so" to ""\n'}
+[23.314610] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/libimu_component.so\n'}
+[23.318990] (v4l2_publisher) StdoutLine: {'line': b'-- Set runtime path of "/home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/libimu_component.so" to ""\n'}
+[23.319814] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/single_camera_publisher\n'}
+[23.320792] (v4l2_publisher) StdoutLine: {'line': b'-- Set runtime path of "/home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/single_camera_publisher" to ""\n'}
+[23.321879] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/stereo_camera_publisher\n'}
+[23.322239] (v4l2_publisher) StdoutLine: {'line': b'-- Set runtime path of "/home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/stereo_camera_publisher" to ""\n'}
+[23.322823] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/imu_publisher\n'}
+[23.323155] (v4l2_publisher) StdoutLine: {'line': b'-- Set runtime path of "/home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/lib/v4l2_publisher/imu_publisher" to ""\n'}
+[23.323717] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include\n'}
+[23.324299] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include/v4l2_publisher\n'}
+[23.324630] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include/v4l2_publisher/rectification.hpp\n'}
+[23.325226] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include/v4l2_publisher/single_camera_node.hpp\n'}
+[23.325831] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include/v4l2_publisher/v4l2_capture.hpp\n'}
+[23.326154] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include/v4l2_publisher/imu_icm_45686.hpp\n'}
+[23.326493] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include/v4l2_publisher/stereo_camera_node.hpp\n'}
+[23.326810] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include/v4l2_publisher/imu_device.hpp\n'}
+[23.330745] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include/v4l2_publisher/imu_node.hpp\n'}
+[23.331776] (-) TimerEvent: {}
+[23.332094] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/include/v4l2_publisher/clock_offset.hpp\n'}
+[23.332873] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/launch\n'}
+[23.333425] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/launch/stereo_camera_with_imu.launch.py\n'}
+[23.333990] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/launch/single_camera_with_imu.launch.py\n'}
+[23.334555] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/launch/__pycache__\n'}
+[23.335574] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/launch/__pycache__/stereo_camera_with_imu.launch.cpython-310.pyc\n'}
+[23.335896] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/ament_index/resource_index/package_run_dependencies/v4l2_publisher\n'}
+[23.336238] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/ament_index/resource_index/parent_prefix_path/v4l2_publisher\n'}
+[23.336553] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/environment/ament_prefix_path.sh\n'}
+[23.336868] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/environment/ament_prefix_path.dsv\n'}
+[23.337183] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/environment/path.sh\n'}
+[23.337632] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/environment/path.dsv\n'}
+[23.337946] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/local_setup.bash\n'}
+[23.338261] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/local_setup.sh\n'}
+[23.338599] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/local_setup.zsh\n'}
+[23.339059] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/local_setup.dsv\n'}
+[23.340059] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/package.dsv\n'}
+[23.342504] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/ament_index/resource_index/packages/v4l2_publisher\n'}
+[23.342902] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/ament_index/resource_index/rclcpp_components/v4l2_publisher\n'}
+[23.343684] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/cmake/v4l2_publisherConfig.cmake\n'}
+[23.344862] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/cmake/v4l2_publisherConfig-version.cmake\n'}
+[23.345573] (v4l2_publisher) StdoutLine: {'line': b'-- Installing: /home/pi/workspace/alg_cam_rospub/install/v4l2_publisher/share/v4l2_publisher/package.xml\n'}
+[23.346757] (v4l2_publisher) CommandEnded: {'returncode': 0}
+[23.430807] (v4l2_publisher) JobEnded: {'identifier': 'v4l2_publisher', 'rc': 0}
+[23.432638] (-) TimerEvent: {}
+[23.432774] (-) EventReactorShutdown: {}

@@ -1,0 +1,12 @@
+/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c: In function ‘i2c_transformer’:
+/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c:25:18: warning: unused variable ‘idx’ [-Wunused-variable]
+   25 |     unsigned int idx;
+      |                  ^~~
+/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c: In function ‘i2c_write_0808’:
+/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c:88:78: warning: unused parameter ‘dat’ [-Wunused-parameter]
+   88 | int i2c_write_0808(uint8_t i2c_bus_index, uint8_t addr, uint8_t reg, uint8_t dat)
+      |                                                                      ~~~~~~~~^~~
+/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c: In function ‘hal_i2c_linux_transformer’:
+/home/pi/workspace/alg_cam_rospub/src/i2c_drive_linux.c:152:18: warning: unused variable ‘idx’ [-Wunused-variable]
+  152 |     unsigned int idx;
+      |                  ^~~

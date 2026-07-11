@@ -1,53 +1,86 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    imu_executable = PathJoinSubstitution([
-        FindPackageShare('v4l2_publisher'), '..', '..', 'lib', 'v4l2_publisher', 'imu_ros2_pub_test'
-    ])
-    imu_library_path = PathJoinSubstitution([
-        FindPackageShare('v4l2_publisher'), '..', '..', 'lib', 'v4l2_publisher'
-    ])
-
     return LaunchDescription([
-        DeclareLaunchArgument('left_topic', default_value='/image/left'),
-        DeclareLaunchArgument('right_topic', default_value='/image/right'),
-        DeclareLaunchArgument('publish_rectified_images', default_value='false'),
-        DeclareLaunchArgument('camera_ready_timeout_sec', default_value='30.0'),
+        # --- Left camera parameters ---
+        DeclareLaunchArgument('left_device_path', default_value='/dev/video0'),
+        DeclareLaunchArgument('left_requested_width', default_value='1280'),
+        DeclareLaunchArgument('left_requested_height', default_value='800'),
+        DeclareLaunchArgument('left_target_width', default_value='640'),
+        DeclareLaunchArgument('left_target_height', default_value='400'),
+        DeclareLaunchArgument('left_pixel_format', default_value='YUYV'),
+        DeclareLaunchArgument('left_fps', default_value='60.0'),
+        DeclareLaunchArgument('left_topic_name', default_value='/image/left'),
+        DeclareLaunchArgument('left_frame_id', default_value='left_camera_link'),
+
+        # --- Right camera parameters ---
+        DeclareLaunchArgument('right_device_path', default_value='/dev/video1'),
+        DeclareLaunchArgument('right_requested_width', default_value='1280'),
+        DeclareLaunchArgument('right_requested_height', default_value='800'),
+        DeclareLaunchArgument('right_target_width', default_value='640'),
+        DeclareLaunchArgument('right_target_height', default_value='400'),
+        DeclareLaunchArgument('right_pixel_format', default_value='YUYV'),
+        DeclareLaunchArgument('right_fps', default_value='60.0'),
+        DeclareLaunchArgument('right_topic_name', default_value='/image/right'),
+        DeclareLaunchArgument('right_frame_id', default_value='right_camera_link'),
+
+        # --- Rectification ---
+        DeclareLaunchArgument('publish_rectified', default_value='false'),
+        DeclareLaunchArgument('stereo_calib_path', default_value='./stereo_calib.yaml'),
+
+        # --- IMU parameters ---
         DeclareLaunchArgument('i2c_bus', default_value='/dev/i2c-3'),
         DeclareLaunchArgument('imu_address', default_value='105'),
-        DeclareLaunchArgument('raw_imu_topic', default_value='_imu/data_raw'),
-        DeclareLaunchArgument('topic_name', default_value='imu/data'),
-        DeclareLaunchArgument('frequency', default_value='200.0'),
+        DeclareLaunchArgument('imu_frequency', default_value='100.0'),
+        DeclareLaunchArgument('imu_topic_name', default_value='imu/data'),
+        DeclareLaunchArgument('imu_frame_id', default_value='imu_link'),
+
+        # --- Stereo camera node ---
         Node(
             package='v4l2_publisher',
-            executable='stereo_image_publisher',
-            name='stereo_image_publisher',
+            executable='stereo_camera_publisher',
+            name='stereo_camera_publisher',
             output='screen',
             parameters=[{
-                'publish_rectified_images': LaunchConfiguration('publish_rectified_images'),
+                'left_device_path': LaunchConfiguration('left_device_path'),
+                'left_requested_width': LaunchConfiguration('left_requested_width'),
+                'left_requested_height': LaunchConfiguration('left_requested_height'),
+                'left_target_width': LaunchConfiguration('left_target_width'),
+                'left_target_height': LaunchConfiguration('left_target_height'),
+                'left_pixel_format': LaunchConfiguration('left_pixel_format'),
+                'left_fps': LaunchConfiguration('left_fps'),
+                'left_topic_name': LaunchConfiguration('left_topic_name'),
+                'left_frame_id': LaunchConfiguration('left_frame_id'),
+                'right_device_path': LaunchConfiguration('right_device_path'),
+                'right_requested_width': LaunchConfiguration('right_requested_width'),
+                'right_requested_height': LaunchConfiguration('right_requested_height'),
+                'right_target_width': LaunchConfiguration('right_target_width'),
+                'right_target_height': LaunchConfiguration('right_target_height'),
+                'right_pixel_format': LaunchConfiguration('right_pixel_format'),
+                'right_fps': LaunchConfiguration('right_fps'),
+                'right_topic_name': LaunchConfiguration('right_topic_name'),
+                'right_frame_id': LaunchConfiguration('right_frame_id'),
+                'publish_rectified': LaunchConfiguration('publish_rectified'),
+                'stereo_calib_path': LaunchConfiguration('stereo_calib_path'),
             }],
         ),
+
+        # --- IMU node ---
         Node(
             package='v4l2_publisher',
-            executable='start_imu_after_camera_ready.py',
-            name='camera_ready_gate',
+            executable='imu_publisher',
+            name='imu_publisher',
             output='screen',
             parameters=[{
-                'left_topic': LaunchConfiguration('left_topic'),
-                'right_topic': LaunchConfiguration('right_topic'),
-                'timeout_sec': LaunchConfiguration('camera_ready_timeout_sec'),
-                'imu_executable': imu_executable,
-                'imu_ld_library_path': imu_library_path,
                 'i2c_bus': LaunchConfiguration('i2c_bus'),
                 'imu_address': LaunchConfiguration('imu_address'),
-                'topic_name': LaunchConfiguration('raw_imu_topic'),
-                'frequency': LaunchConfiguration('frequency'),
-                'output_imu_topic': LaunchConfiguration('topic_name'),
+                'frequency': LaunchConfiguration('imu_frequency'),
+                'topic_name': LaunchConfiguration('imu_topic_name'),
+                'frame_id': LaunchConfiguration('imu_frame_id'),
             }],
         ),
     ])

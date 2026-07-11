@@ -11,7 +11,7 @@ class ImuNode : public rclcpp::Node
 {
 public:
   explicit ImuNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
-  ~ImuNode() override = default;
+  ~ImuNode() override;
 
 private:
   struct Impl;

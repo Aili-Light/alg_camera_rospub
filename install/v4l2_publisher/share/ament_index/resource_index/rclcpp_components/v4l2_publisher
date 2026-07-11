@@ -1,0 +1,3 @@
+v4l2_publisher::SingleCameraNode;lib/libsingle_camera_component.so
+v4l2_publisher::StereoCameraNode;lib/libstereo_camera_component.so
+v4l2_publisher::ImuNode;lib/libimu_component.so

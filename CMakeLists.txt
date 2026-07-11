@@ -7,6 +7,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 
@@ -23,16 +24,86 @@ target_link_libraries(camera_backend_probe ${OpenCV_LIBS})
 
 add_library(rectification STATIC src/rectification.cpp)
 target_compile_features(rectification PUBLIC cxx_std_17)
+target_compile_options(rectification PRIVATE -fPIC)
 target_include_directories(rectification PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(rectification ${OpenCV_LIBS})
 
+# IMU device library (C++ wrapper over C HAL)
+add_library(imu_device STATIC
+  src/imu_device.cpp
+  src/imu_icm_45686.cpp
+  src/i2c_drive_linux.c
+)
+target_compile_features(imu_device PUBLIC cxx_std_17)
+set_source_files_properties(src/i2c_drive_linux.c PROPERTIES LANGUAGE C)
+target_include_directories(imu_device PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_include_directories(imu_device PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Shared V4L2 backend library (capture + clock offset)
+add_library(v4l2_publisher_backend STATIC
+  src/v4l2_capture.cpp
+  src/clock_offset.cpp
+)
+target_compile_features(v4l2_publisher_backend PUBLIC cxx_std_17)
+target_compile_options(v4l2_publisher_backend PRIVATE -fPIC)
+target_include_directories(v4l2_publisher_backend PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(v4l2_publisher_backend ${OpenCV_LIBS})
+
+# Composable node shared library (loaded by rclcpp_components)
+add_library(single_camera_node_component SHARED
+  src/single_camera_node.cpp
+)
+target_compile_features(single_camera_node_component PUBLIC cxx_std_17)
+target_include_directories(single_camera_node_component PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(single_camera_node_component
+  v4l2_publisher_backend
+  rectification
+  ${OpenCV_LIBS}
+)
+ament_target_dependencies(single_camera_node_component
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+)
+rclcpp_components_register_nodes(single_camera_node_component
+  "v4l2_publisher::SingleCameraNode"
+)
+
+# Standalone executable entry point
+add_executable(single_camera_node_exe src/single_camera_node_main.cpp)
+target_compile_features(single_camera_node_exe PUBLIC cxx_std_17)
+target_include_directories(single_camera_node_exe PRIVATE
+  ${OpenCV_INCLUDE_DIRS}
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(single_camera_node_exe
+  single_camera_node_component
+  ${OpenCV_LIBS}
+)
+ament_target_dependencies(single_camera_node_exe rclcpp rclcpp_components)
+
 install(TARGETS
   stereo_image_publisher
   camera_backend_probe
   rectification
+  imu_device
+  v4l2_publisher_backend
+  single_camera_node_component
+  single_camera_node_exe
   DESTINATION lib/${PROJECT_NAME}
 )
 

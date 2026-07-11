@@ -21,9 +21,18 @@ target_compile_features(camera_backend_probe PUBLIC cxx_std_17)
 target_include_directories(camera_backend_probe PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(camera_backend_probe ${OpenCV_LIBS})
 
+add_library(rectification STATIC src/rectification.cpp)
+target_compile_features(rectification PUBLIC cxx_std_17)
+target_include_directories(rectification PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(rectification ${OpenCV_LIBS})
+
 install(TARGETS
   stereo_image_publisher
   camera_backend_probe
+  rectification
   DESTINATION lib/${PROJECT_NAME}
 )
 

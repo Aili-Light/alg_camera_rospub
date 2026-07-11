@@ -77,20 +77,40 @@ ament_target_dependencies(imu_component
 # --- Standalone executables ---
 add_executable(single_camera_publisher src/single_camera_main.cpp)
 target_link_libraries(single_camera_publisher single_camera_component)
+ament_target_dependencies(single_camera_publisher rclcpp sensor_msgs)
 target_include_directories(single_camera_publisher PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 add_executable(stereo_camera_publisher src/stereo_camera_main.cpp)
 target_link_libraries(stereo_camera_publisher stereo_camera_component)
+ament_target_dependencies(stereo_camera_publisher rclcpp sensor_msgs)
 target_include_directories(stereo_camera_publisher PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
 add_executable(imu_publisher src/imu_main.cpp)
 target_link_libraries(imu_publisher imu_component)
+ament_target_dependencies(imu_publisher rclcpp sensor_msgs)
 target_include_directories(imu_publisher PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+# Ensure RPATH is set so executables can find their companion .so in the install tree
+set_target_properties(single_camera_publisher PROPERTIES
+  INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}"
+  BUILD_WITH_INSTALL_RPATH FALSE
+  INSTALL_RPATH_USE_LINK_PATH TRUE
+)
+set_target_properties(stereo_camera_publisher PROPERTIES
+  INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}"
+  BUILD_WITH_INSTALL_RPATH FALSE
+  INSTALL_RPATH_USE_LINK_PATH TRUE
+)
+set_target_properties(imu_publisher PROPERTIES
+  INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}"
+  BUILD_WITH_INSTALL_RPATH FALSE
+  INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
 # --- Install targets ---

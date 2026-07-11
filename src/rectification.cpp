@@ -1,10 +1,10 @@
-#include "v4l2_publisher/rectification.hpp"
+#include "alg_camera_rospub/rectification.hpp"
 
 #include <stdexcept>
 
 #include <opencv2/core/persistence.hpp>
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 RectificationMaps load_rectification_maps(const std::string & yaml_path,
@@ -53,4 +53,4 @@ void validate_rectification_maps(const RectificationMaps & maps,
   }
 }
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub

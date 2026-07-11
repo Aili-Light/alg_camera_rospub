@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(v4l2_publisher)
+project(alg_camera_rospub)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -138,15 +138,15 @@ install(DIRECTORY launch
 
 # --- Component registration ---
 rclcpp_components_register_nodes(single_camera_component
-  "v4l2_publisher::SingleCameraNode"
+  "alg_camera_rospub::SingleCameraNode"
 )
 
 rclcpp_components_register_nodes(stereo_camera_component
-  "v4l2_publisher::StereoCameraNode"
+  "alg_camera_rospub::StereoCameraNode"
 )
 
 rclcpp_components_register_nodes(imu_component
-  "v4l2_publisher::ImuNode"
+  "alg_camera_rospub::ImuNode"
 )
 
 ament_package()

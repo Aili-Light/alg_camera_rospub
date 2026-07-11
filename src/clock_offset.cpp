@@ -1,8 +1,8 @@
-#include "v4l2_publisher/clock_offset.hpp"
+#include "alg_camera_rospub/clock_offset.hpp"
 
 #include <chrono>
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 ClockOffset::ClockOffset()
@@ -37,4 +37,4 @@ int64_t ClockOffset::now_ns() const
   return corrected_system_ns(steady_ns);
 }
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub

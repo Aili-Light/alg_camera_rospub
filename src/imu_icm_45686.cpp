@@ -1,4 +1,4 @@
-#include "v4l2_publisher/imu_icm_45686.hpp"
+#include "alg_camera_rospub/imu_icm_45686.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -162,7 +162,7 @@ void imu_icm_45686_destroy(struct imu_device * dev)
 // C++ Wrapper: ImuIcm45686
 // ==========================================================================
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 ImuIcm45686::ImuIcm45686(const std::string & i2c_device_path, uint8_t i2c_addr)
@@ -217,4 +217,4 @@ bool ImuIcm45686::read_temp(float & temp)
   return imu_read_temp(dev_, &temp) == 0;
 }
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub

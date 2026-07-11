@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>v4l2_publisher</name>
+  <name>alg_camera_rospub</name>
   <version>0.0.1</version>
   <description>Unified camera (single/stereo V4L2) and IMU (I2C ICM-45686) publisher for ROS2.</description>
   <maintainer email="pi@example.com">pi</maintainer>

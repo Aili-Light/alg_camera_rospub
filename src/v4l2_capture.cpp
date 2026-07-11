@@ -1,4 +1,4 @@
-#include "v4l2_publisher/v4l2_capture.hpp"
+#include "alg_camera_rospub/v4l2_capture.hpp"
 
 #include <fcntl.h>
 #include <linux/videodev2.h>
@@ -21,7 +21,7 @@
 
 #include <opencv2/imgproc.hpp>
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 namespace
@@ -507,4 +507,4 @@ bool V4L2Capture::wait_for_frame()
   return true;
 }
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub

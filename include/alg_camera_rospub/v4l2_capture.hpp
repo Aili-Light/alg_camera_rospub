@@ -1,5 +1,5 @@
-#ifndef V4L2_PUBLISHER__V4L2_CAPTURE_HPP_
-#define V4L2_PUBLISHER__V4L2_CAPTURE_HPP_
+#ifndef ALG_CAMERA_ROSPUB__V4L2_CAPTURE_HPP_
+#define ALG_CAMERA_ROSPUB__V4L2_CAPTURE_HPP_
 
 #include <atomic>
 #include <cstdint>
@@ -11,7 +11,7 @@
 
 #include <opencv2/core.hpp>
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 struct V4L2Config
@@ -110,6 +110,6 @@ private:
   std::string publish_mode_{"unknown"};
 };
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub
 
-#endif  // V4L2_PUBLISHER__V4L2_CAPTURE_HPP_
+#endif  // ALG_CAMERA_ROSPUB__V4L2_CAPTURE_HPP_

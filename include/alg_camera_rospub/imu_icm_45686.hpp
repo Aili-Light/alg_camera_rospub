@@ -1,16 +1,16 @@
-#ifndef V4L2_PUBLISHER__IMU_ICM_45686_HPP_
-#define V4L2_PUBLISHER__IMU_ICM_45686_HPP_
+#ifndef ALG_CAMERA_ROSPUB__IMU_ICM_45686_HPP_
+#define ALG_CAMERA_ROSPUB__IMU_ICM_45686_HPP_
 
 #include <cstdint>
 #include <string>
 
-#include "v4l2_publisher/imu_device.hpp"
+#include "alg_camera_rospub/imu_device.hpp"
 
 // Forward declarations for C types
 struct hal_i2c;
 struct imu_device;
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 /// ICM-45686 IMU driver.
@@ -39,6 +39,6 @@ private:
   struct imu_device * dev_{nullptr};
 };
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub
 
-#endif  // V4L2_PUBLISHER__IMU_ICM_45686_HPP_
+#endif  // ALG_CAMERA_ROSPUB__IMU_ICM_45686_HPP_

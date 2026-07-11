@@ -1,9 +1,9 @@
-#ifndef V4L2_PUBLISHER__CLOCK_OFFSET_HPP_
-#define V4L2_PUBLISHER__CLOCK_OFFSET_HPP_
+#ifndef ALG_CAMERA_ROSPUB__CLOCK_OFFSET_HPP_
+#define ALG_CAMERA_ROSPUB__CLOCK_OFFSET_HPP_
 
 #include <cstdint>
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 class ClockOffset
@@ -27,6 +27,6 @@ private:
   int64_t offset_ns_;
 };
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub
 
-#endif  // V4L2_PUBLISHER__CLOCK_OFFSET_HPP_
+#endif  // ALG_CAMERA_ROSPUB__CLOCK_OFFSET_HPP_

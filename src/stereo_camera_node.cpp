@@ -12,12 +12,12 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
-#include "v4l2_publisher/clock_offset.hpp"
-#include "v4l2_publisher/rectification.hpp"
-#include "v4l2_publisher/stereo_camera_node.hpp"
-#include "v4l2_publisher/v4l2_capture.hpp"
+#include "alg_camera_rospub/clock_offset.hpp"
+#include "alg_camera_rospub/rectification.hpp"
+#include "alg_camera_rospub/stereo_camera_node.hpp"
+#include "alg_camera_rospub/v4l2_capture.hpp"
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 namespace
@@ -248,7 +248,7 @@ StereoCameraNode::StereoCameraNode(const rclcpp::NodeOptions & options)
 
 StereoCameraNode::~StereoCameraNode() = default;
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub
 
 #include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(v4l2_publisher::StereoCameraNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(alg_camera_rospub::StereoCameraNode)

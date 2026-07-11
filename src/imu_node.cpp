@@ -6,12 +6,12 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 
-#include "v4l2_publisher/clock_offset.hpp"
-#include "v4l2_publisher/imu_device.hpp"
-#include "v4l2_publisher/imu_icm_45686.hpp"
-#include "v4l2_publisher/imu_node.hpp"
+#include "alg_camera_rospub/clock_offset.hpp"
+#include "alg_camera_rospub/imu_device.hpp"
+#include "alg_camera_rospub/imu_icm_45686.hpp"
+#include "alg_camera_rospub/imu_node.hpp"
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 namespace
@@ -122,7 +122,7 @@ ImuNode::ImuNode(const rclcpp::NodeOptions & options)
 
 ImuNode::~ImuNode() = default;
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub
 
 #include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(v4l2_publisher::ImuNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(alg_camera_rospub::ImuNode)

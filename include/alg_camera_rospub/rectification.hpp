@@ -1,11 +1,11 @@
-#ifndef V4L2_PUBLISHER__RECTIFICATION_HPP_
-#define V4L2_PUBLISHER__RECTIFICATION_HPP_
+#ifndef ALG_CAMERA_ROSPUB__RECTIFICATION_HPP_
+#define ALG_CAMERA_ROSPUB__RECTIFICATION_HPP_
 
 #include <string>
 
 #include <opencv2/core.hpp>
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 struct RectificationMaps
@@ -25,6 +25,6 @@ void validate_rectification_maps(const RectificationMaps & maps,
                                  uint32_t width,
                                  uint32_t height);
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub
 
-#endif  // V4L2_PUBLISHER__RECTIFICATION_HPP_
+#endif  // ALG_CAMERA_ROSPUB__RECTIFICATION_HPP_

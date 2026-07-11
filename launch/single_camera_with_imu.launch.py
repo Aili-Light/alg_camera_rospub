@@ -31,7 +31,7 @@ def generate_launch_description():
 
         # --- Single camera node (starts immediately) ---
         Node(
-            package='v4l2_publisher',
+            package='alg_camera_rospub',
             executable='single_camera_publisher',
             name='single_camera_publisher',
             output='screen',
@@ -55,7 +55,7 @@ def generate_launch_description():
             period=LaunchConfiguration('imu_start_delay'),
             actions=[
                 Node(
-                    package='v4l2_publisher',
+                    package='alg_camera_rospub',
                     executable='imu_publisher',
                     name='imu_publisher',
                     output='screen',

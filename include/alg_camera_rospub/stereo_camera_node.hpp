@@ -1,9 +1,9 @@
-#ifndef V4L2_PUBLISHER__STEREO_CAMERA_NODE_HPP_
-#define V4L2_PUBLISHER__STEREO_CAMERA_NODE_HPP_
+#ifndef ALG_CAMERA_ROSPUB__STEREO_CAMERA_NODE_HPP_
+#define ALG_CAMERA_ROSPUB__STEREO_CAMERA_NODE_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 class StereoCameraNode : public rclcpp::Node
 {
@@ -15,6 +15,6 @@ private:
   struct Impl;
   std::unique_ptr<Impl> impl_;
 };
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub
 
-#endif  // V4L2_PUBLISHER__STEREO_CAMERA_NODE_HPP_
+#endif  // ALG_CAMERA_ROSPUB__STEREO_CAMERA_NODE_HPP_

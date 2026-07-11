@@ -1,7 +1,7 @@
-#ifndef V4L2_PUBLISHER__IMU_DEVICE_HPP_
-#define V4L2_PUBLISHER__IMU_DEVICE_HPP_
+#ifndef ALG_CAMERA_ROSPUB__IMU_DEVICE_HPP_
+#define ALG_CAMERA_ROSPUB__IMU_DEVICE_HPP_
 
-namespace v4l2_publisher
+namespace alg_camera_rospub
 {
 
 /// Abstract IMU device interface.
@@ -24,6 +24,6 @@ public:
   virtual bool read_temp(float & temp) = 0;
 };
 
-}  // namespace v4l2_publisher
+}  // namespace alg_camera_rospub
 
-#endif  // V4L2_PUBLISHER__IMU_DEVICE_HPP_
+#endif  // ALG_CAMERA_ROSPUB__IMU_DEVICE_HPP_

@@ -81,9 +81,16 @@ private:
   void close_device();
   bool wait_for_frame();
 
+  // Internal helper struct — must be complete before buffers_ declaration below
+  struct MmapBuffer
+  {
+    void * start{nullptr};
+    size_t length{0};
+  };
+
   V4L2Config config_;
   int fd_{-1};
-  std::vector<struct MmapBuffer> buffers_;
+  std::vector<MmapBuffer> buffers_;
   std::atomic<bool> running_{false};
   std::atomic<std::uint64_t> capture_count_{0};
   std::atomic<std::uint64_t> publish_count_{0};
@@ -101,13 +108,6 @@ private:
   uint32_t publish_height_{0};
   bool resize_to_target_{false};
   std::string publish_mode_{"unknown"};
-
-  // Internal helper struct
-  struct MmapBuffer
-  {
-    void * start{nullptr};
-    size_t length{0};
-  };
 };
 
 }  // namespace v4l2_publisher

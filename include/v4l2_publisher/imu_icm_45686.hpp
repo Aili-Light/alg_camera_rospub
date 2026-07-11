@@ -37,8 +37,6 @@ public:
 private:
   struct hal_i2c * i2c_bus_{nullptr};
   struct imu_device * dev_{nullptr};
-  float accel_scale_{4096.0f};
-  float gyro_scale_{16.4f};
 };
 
 }  // namespace v4l2_publisher

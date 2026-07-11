@@ -83,6 +83,57 @@ rclcpp_components_register_nodes(single_camera_node_component
   "v4l2_publisher::SingleCameraNode"
 )
 
+# Composable IMU node shared library
+add_library(imu_node_component SHARED
+  src/imu_node.cpp
+)
+target_compile_features(imu_node_component PUBLIC cxx_std_17)
+target_include_directories(imu_node_component PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(imu_node_component imu_device)
+ament_target_dependencies(imu_node_component
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+)
+rclcpp_components_register_nodes(imu_node_component
+  "v4l2_publisher::ImuNode"
+)
+
+# Standalone IMU node executable
+add_executable(imu_node_exe src/imu_node_main.cpp)
+target_compile_features(imu_node_exe PUBLIC cxx_std_17)
+target_include_directories(imu_node_exe PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(imu_node_exe imu_node_component)
+ament_target_dependencies(imu_node_exe rclcpp rclcpp_components)
+
+# Composable stereo camera node shared library
+add_library(stereo_camera_node_component SHARED
+  src/stereo_camera_node.cpp
+)
+target_compile_features(stereo_camera_node_component PUBLIC cxx_std_17)
+target_include_directories(stereo_camera_node_component PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(stereo_camera_node_component
+  v4l2_publisher_backend
+  rectification
+  ${OpenCV_LIBS}
+)
+ament_target_dependencies(stereo_camera_node_component
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+)
+rclcpp_components_register_nodes(stereo_camera_node_component
+  "v4l2_publisher::StereoCameraNode"
+)
+
 # Standalone executable entry point
 add_executable(single_camera_node_exe src/single_camera_node_main.cpp)
 target_compile_features(single_camera_node_exe PUBLIC cxx_std_17)
@@ -103,7 +154,10 @@ install(TARGETS
   imu_device
   v4l2_publisher_backend
   single_camera_node_component
+  stereo_camera_node_component
   single_camera_node_exe
+  imu_node_component
+  imu_node_exe
   DESTINATION lib/${PROJECT_NAME}
 )
 

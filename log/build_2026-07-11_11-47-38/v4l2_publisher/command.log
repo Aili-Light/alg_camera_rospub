@@ -1,6 +1,0 @@
-Invoking command in '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/pi/workspace/alg_cam_rospub -DCMAKE_INSTALL_PREFIX=/home/pi/workspace/alg_cam_rospub/install/v4l2_publisher
-Invoked command in '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/pi/workspace/alg_cam_rospub -DCMAKE_INSTALL_PREFIX=/home/pi/workspace/alg_cam_rospub/install/v4l2_publisher
-Invoking command in '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/pi/workspace/alg_cam_rospub/build/v4l2_publisher -- -j8 -l8
-Invoked command in '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/pi/workspace/alg_cam_rospub/build/v4l2_publisher -- -j8 -l8
-Invoking command in '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/pi/workspace/alg_cam_rospub/build/v4l2_publisher
-Invoked command in '/home/pi/workspace/alg_cam_rospub/build/v4l2_publisher' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/pi/workspace/alg_cam_rospub/build/v4l2_publisher

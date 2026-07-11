@@ -24,6 +24,7 @@ struct V4L2Config
   uint32_t pixel_format     = 0;  // V4L2_PIX_FMT_YUYV or similar, set by caller
   uint32_t buffer_count     = 4;
   double   requested_fps    = 60.0;
+  bool     output_color     = false;  // true = BGR (3-channel), false = mono8
 };
 
 class V4L2Capture
@@ -45,10 +46,9 @@ public:
   void stop();
 
   /// Block until a frame is available (2-second timeout), dequeue it,
-  /// extract luminance, optionally resize. Returns the grayscale frame
-  /// or std::nullopt on timeout/failure.
-  /// After a successful return, frame_timestamp_ns() gives the raw
-  /// V4L2 buffer timestamp in monotonic-clock nanoseconds.
+  /// extract luminance (or color if output_color=true), optionally resize.
+  /// Returns the frame or std::nullopt on timeout/failure.
+  /// Channels: 1 (mono8) when output_color=false, 3 (BGR) when output_color=true.
   std::optional<cv::Mat> grab();
 
   /// Timestamp (monotonic-clock nanoseconds) of the last successfully

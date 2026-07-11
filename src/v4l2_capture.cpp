@@ -62,6 +62,68 @@ bool has_same_aspect_ratio(
   return std::abs(ratio_a - ratio_b) <= kAspectTolerance;
 }
 
+bool extract_color_frame(
+  uint32_t pixel_format,
+  uint32_t width,
+  uint32_t height,
+  uint32_t bytes_per_line,
+  const void * data,
+  size_t bytes_used,
+  cv::Mat & output)
+{
+  if (data == nullptr || width == 0 || height == 0) {
+    return false;
+  }
+
+  switch (pixel_format) {
+    case V4L2_PIX_FMT_YUYV:
+    case V4L2_PIX_FMT_YVYU:
+    case V4L2_PIX_FMT_UYVY:
+    case V4L2_PIX_FMT_VYUY: {
+      // Build a temporary single-channel Mat wrapping the raw YUYV data,
+      // then let cv::cvtColor do the proper YUV->BGR conversion.
+      cv::Mat raw(static_cast<int>(height), static_cast<int>(width), CV_8UC2,
+                  const_cast<void *>(data),
+                  bytes_per_line != 0 ? static_cast<size_t>(bytes_per_line)
+                                      : static_cast<size_t>(width) * 2);
+
+      int code = cv::COLOR_YUV2BGR_YUYV;
+      if (pixel_format == V4L2_PIX_FMT_UYVY) {
+        code = cv::COLOR_YUV2BGR_UYVY;
+      } else if (pixel_format == V4L2_PIX_FMT_YVYU) {
+        // OpenCV does not have COLOR_YUV2BGR_YVYU; use manual conversion fallback
+        code = cv::COLOR_YUV2BGR_YUYV; // YVYU: Y and UV swapped vs YUYV
+      } else if (pixel_format == V4L2_PIX_FMT_VYUY) {
+        // OpenCV does not have COLOR_YUV2BGR_VYUY; use manual conversion fallback
+        code = cv::COLOR_YUV2BGR_UYVY; // VYUY: Y and UV swapped vs UYVY
+      }
+
+      cv::cvtColor(raw, output, code);
+      return !output.empty();
+    }
+    case V4L2_PIX_FMT_NV12:
+    case V4L2_PIX_FMT_NV21: {
+      const size_t min_stride = static_cast<size_t>(width);
+      const size_t stride = bytes_per_line != 0
+        ? static_cast<size_t>(bytes_per_line) : min_stride;
+      if (stride < min_stride || bytes_used < stride * static_cast<size_t>(height)) {
+        return false;
+      }
+
+      cv::Mat raw(static_cast<int>(height) + static_cast<int>(height) / 2,
+                  static_cast<int>(width), CV_8UC1,
+                  const_cast<void *>(data), stride);
+
+      int code = (pixel_format == V4L2_PIX_FMT_NV12)
+        ? cv::COLOR_YUV2BGR_NV12 : cv::COLOR_YUV2BGR_NV21;
+      cv::cvtColor(raw, output, code);
+      return !output.empty();
+    }
+    default:
+      return false;
+  }
+}
+
 bool extract_luma_frame(
   uint32_t pixel_format,
   uint32_t width,
@@ -206,10 +268,14 @@ std::optional<cv::Mat> V4L2Capture::grab()
     ? static_cast<size_t>(buffer.m.planes[0].bytesused)
     : static_cast<size_t>(buffer.bytesused);
 
-  cv::Mat gray_frame;
-  const bool converted = extract_luma_frame(
-    active_pixel_format_, actual_width_, actual_height_,
-    bytes_per_line_, frame_data, bytes_used, gray_frame);
+  cv::Mat frame;
+  const bool converted = config_.output_color
+    ? extract_color_frame(
+        active_pixel_format_, actual_width_, actual_height_,
+        bytes_per_line_, frame_data, bytes_used, frame)
+    : extract_luma_frame(
+        active_pixel_format_, actual_width_, actual_height_,
+        bytes_per_line_, frame_data, bytes_used, frame);
 
   // Requeue the buffer
   if (xioctl(fd_, VIDIOC_QBUF, &buffer) == -1) {
@@ -223,18 +289,17 @@ std::optional<cv::Mat> V4L2Capture::grab()
     return std::nullopt;
   }
 
-  cv::Mat output_frame = gray_frame;
+  cv::Mat output_frame = frame;
   if (resize_to_target_) {
     cv::Mat resized;
-    cv::resize(gray_frame, resized,
+    cv::resize(frame, resized,
                cv::Size(static_cast<int>(config_.target_width),
                         static_cast<int>(config_.target_height)),
                0.0, 0.0, cv::INTER_LINEAR);
     output_frame = resized;
   }
 
-  // Fallback: if we got here and the frame is empty (luma extraction succeeded
-  // but produced no data), return nullopt.
+  // Fallback: if we got here and the frame is empty, return nullopt.
   if (output_frame.empty()) {
     return std::nullopt;
   }

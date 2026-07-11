@@ -7,13 +7,14 @@
 
 #include <linux/videodev2.h>
 
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
 #include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/compressed_image.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
 #include "alg_camera_rospub/clock_offset.hpp"
-#include "alg_camera_rospub/rectification.hpp"
 #include "alg_camera_rospub/stereo_camera_node.hpp"
 #include "alg_camera_rospub/v4l2_capture.hpp"
 
@@ -31,11 +32,19 @@ uint32_t fourcc_from_string(const std::string & s)
   return v4l2_fourcc(s[0], s[1], s[2], s[3]);
 }
 
+std::string encoding_for_mat(const cv::Mat & frame)
+{
+  if (frame.channels() == 3) {
+    return "bgr8";
+  }
+  return "mono8";
+}
+
 void copy_mat_to_image(const cv::Mat & frame, sensor_msgs::msg::Image & msg)
 {
   msg.height = static_cast<uint32_t>(frame.rows);
   msg.width = static_cast<uint32_t>(frame.cols);
-  msg.encoding = "mono8";
+  msg.encoding = encoding_for_mat(frame);
   msg.is_bigendian = false;
   msg.step = static_cast<sensor_msgs::msg::Image::_step_type>(frame.step);
 
@@ -69,6 +78,7 @@ V4L2Config make_config(rclcpp::Node & node, const std::string & prefix)
   config.pixel_format = fourcc_from_string(
     node.declare_parameter<std::string>(prefix + "pixel_format", "YUYV"));
   config.requested_fps = node.declare_parameter<double>(prefix + "fps", 60.0);
+  config.output_color = node.declare_parameter<bool>(prefix + "output_color", false);
   return config;
 }
 
@@ -88,9 +98,8 @@ struct StereoCameraNode::Impl
     right_topic_ = node_->declare_parameter<std::string>("right_topic_name", "/image/right");
     left_frame_id_ = node_->declare_parameter<std::string>("left_frame_id", "left_camera_link");
     right_frame_id_ = node_->declare_parameter<std::string>("right_frame_id", "right_camera_link");
-    const bool rect_enable = node_->declare_parameter<bool>("publish_rectified", false);
-    const std::string stereo_calib =
-      node_->declare_parameter<std::string>("stereo_calib_path", "./stereo_calib.yaml");
+    const bool publish_compressed = node_->declare_parameter<bool>("publish_compressed", false);
+    compressed_quality_ = node_->declare_parameter<int>("compressed_quality", 80);
 
     // --- Create and start V4L2 captures ---
     left_cam_ = std::make_unique<V4L2Capture>(left_config);
@@ -109,27 +118,24 @@ struct StereoCameraNode::Impl
     left_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(left_topic_, 10);
     right_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(right_topic_, 10);
 
-    // --- Optional rectified publishers ---
-    if (rect_enable) {
-      left_rect_maps_ = load_rectification_maps(stereo_calib, "left");
-      right_rect_maps_ = load_rectification_maps(stereo_calib, "right");
-      validate_rectification_maps(*left_rect_maps_, "left",
-        left_cam_->publish_width(), left_cam_->publish_height());
-      validate_rectification_maps(*right_rect_maps_, "right",
-        right_cam_->publish_width(), right_cam_->publish_height());
-      left_rect_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(left_topic_ + "_rect", 10);
-      right_rect_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(right_topic_ + "_rect", 10);
+    // --- Optional compressed publishers ---
+    if (publish_compressed) {
+      left_compressed_pub_ = node_->create_publisher<sensor_msgs::msg::CompressedImage>(
+        left_topic_ + "/compressed", 10);
+      right_compressed_pub_ = node_->create_publisher<sensor_msgs::msg::CompressedImage>(
+        right_topic_ + "/compressed", 10);
     }
 
     // --- Log setup ---
     RCLCPP_INFO(node_->get_logger(),
-      "left: capture=%ux%u publish=%ux%u fourcc=%s | right: capture=%ux%u publish=%ux%u fourcc=%s",
+      "left: capture=%ux%u publish=%ux%u fourcc=%s | right: capture=%ux%u publish=%ux%u fourcc=%s compressed=%d",
       left_cam_->actual_width(), left_cam_->actual_height(),
       left_cam_->publish_width(), left_cam_->publish_height(),
       left_cam_->fourcc_string().c_str(),
       right_cam_->actual_width(), right_cam_->actual_height(),
       right_cam_->publish_width(), right_cam_->publish_height(),
-      right_cam_->fourcc_string().c_str());
+      right_cam_->fourcc_string().c_str(),
+      static_cast<int>(publish_compressed));
 
     // --- Stats timer (also recalibrates clock offset) ---
     last_stats_time_ = node_->now();
@@ -157,16 +163,13 @@ struct StereoCameraNode::Impl
 
   void capture_and_publish()
   {
-    publish_one(left_cam_.get(), left_pub_, left_rect_pub_,
-                left_rect_maps_, left_frame_id_);
-    publish_one(right_cam_.get(), right_pub_, right_rect_pub_,
-                right_rect_maps_, right_frame_id_);
+    publish_one(left_cam_.get(), left_pub_, left_compressed_pub_, left_frame_id_);
+    publish_one(right_cam_.get(), right_pub_, right_compressed_pub_, right_frame_id_);
   }
 
   void publish_one(V4L2Capture * cam,
                    const rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr & pub,
-                   const rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr & rect_pub,
-                   const std::optional<RectificationMaps> & rect_maps,
+                   const rclcpp::Publisher<sensor_msgs::msg::CompressedImage>::SharedPtr & comp_pub,
                    const std::string & frame_id)
   {
     auto frame = cam->grab();
@@ -186,14 +189,19 @@ struct StereoCameraNode::Impl
     const auto header = msg.header;
     pub->publish(std::move(msg));
 
-    if (rect_pub && rect_maps) {
-      cv::Mat rectified;
-      cv::remap(*frame, rectified, rect_maps->map1, rect_maps->map2, cv::INTER_LINEAR);
-
-      sensor_msgs::msg::Image rect_msg;
-      rect_msg.header = header;
-      copy_mat_to_image(rectified, rect_msg);
-      rect_pub->publish(std::move(rect_msg));
+    if (comp_pub) {
+      std::vector<int> jpeg_params = {cv::IMWRITE_JPEG_QUALITY, compressed_quality_};
+      std::vector<uchar> jpeg_buf;
+      if (cv::imencode(".jpg", *frame, jpeg_buf, jpeg_params)) {
+        sensor_msgs::msg::CompressedImage comp_msg;
+        comp_msg.header = header;
+        comp_msg.format = "jpeg";
+        comp_msg.data = std::move(jpeg_buf);
+        comp_pub->publish(std::move(comp_msg));
+      } else {
+        RCLCPP_WARN_THROTTLE(node_->get_logger(), *node_->get_clock(), 5000,
+          "Failed to encode compressed image");
+      }
     }
   }
 
@@ -231,10 +239,9 @@ struct StereoCameraNode::Impl
   std::unique_ptr<V4L2Capture> right_cam_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr left_pub_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr right_pub_;
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr left_rect_pub_;
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr right_rect_pub_;
-  std::optional<RectificationMaps> left_rect_maps_;
-  std::optional<RectificationMaps> right_rect_maps_;
+  rclcpp::Publisher<sensor_msgs::msg::CompressedImage>::SharedPtr left_compressed_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::CompressedImage>::SharedPtr right_compressed_pub_;
+  int compressed_quality_{80};
   rclcpp::TimerBase::SharedPtr stats_timer_;
   rclcpp::TimerBase::SharedPtr capture_timer_;
   rclcpp::Time last_stats_time_;

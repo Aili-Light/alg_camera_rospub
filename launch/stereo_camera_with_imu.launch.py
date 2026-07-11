@@ -1,5 +1,5 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, TimerAction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -39,7 +39,10 @@ def generate_launch_description():
         DeclareLaunchArgument('imu_topic_name', default_value='imu/data'),
         DeclareLaunchArgument('imu_frame_id', default_value='imu_link'),
 
-        # --- Stereo camera node ---
+        # --- IMU start delay ---
+        DeclareLaunchArgument('imu_start_delay', default_value='2.0'),
+
+        # --- Stereo camera node (starts immediately) ---
         Node(
             package='v4l2_publisher',
             executable='stereo_camera_publisher',
@@ -69,18 +72,23 @@ def generate_launch_description():
             }],
         ),
 
-        # --- IMU node ---
-        Node(
-            package='v4l2_publisher',
-            executable='imu_publisher',
-            name='imu_publisher',
-            output='screen',
-            parameters=[{
-                'i2c_bus': LaunchConfiguration('i2c_bus'),
-                'imu_address': LaunchConfiguration('imu_address'),
-                'frequency': LaunchConfiguration('imu_frequency'),
-                'topic_name': LaunchConfiguration('imu_topic_name'),
-                'frame_id': LaunchConfiguration('imu_frame_id'),
-            }],
+        # --- IMU node (delayed until camera streaming enables I2C bus) ---
+        TimerAction(
+            period=LaunchConfiguration('imu_start_delay'),
+            actions=[
+                Node(
+                    package='v4l2_publisher',
+                    executable='imu_publisher',
+                    name='imu_publisher',
+                    output='screen',
+                    parameters=[{
+                        'i2c_bus': LaunchConfiguration('i2c_bus'),
+                        'imu_address': LaunchConfiguration('imu_address'),
+                        'frequency': LaunchConfiguration('imu_frequency'),
+                        'topic_name': LaunchConfiguration('imu_topic_name'),
+                        'frame_id': LaunchConfiguration('imu_frame_id'),
+                    }],
+                ),
+            ],
         ),
     ])

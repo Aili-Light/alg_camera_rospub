@@ -78,7 +78,7 @@ V4L2Config make_config(rclcpp::Node & node, const std::string & prefix)
   config.pixel_format = fourcc_from_string(
     node.declare_parameter<std::string>(prefix + "pixel_format", "YUYV"));
   config.requested_fps = node.declare_parameter<double>(prefix + "fps", 60.0);
-  config.output_color = node.declare_parameter<bool>(prefix + "output_color", false);
+  config.output_color = node.declare_parameter<bool>(prefix + "output_color", true);
   return config;
 }
 

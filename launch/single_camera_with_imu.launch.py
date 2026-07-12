@@ -16,7 +16,7 @@ def generate_launch_description():
         DeclareLaunchArgument('fps', default_value='60.0'),
         DeclareLaunchArgument('topic_name', default_value='/image'),
         DeclareLaunchArgument('frame_id', default_value='camera_link'),
-        DeclareLaunchArgument('output_color', default_value='false'),
+        DeclareLaunchArgument('output_color', default_value='true'),
         DeclareLaunchArgument('publish_compressed', default_value='false'),
         DeclareLaunchArgument('compressed_quality', default_value='80'),
 

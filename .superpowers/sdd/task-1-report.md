@@ -1,22 +1,27 @@
-## Task 1 Report: Topic Validation Script
+## Task 1 Report: Raw Image Encoding Dispatch Table
 
 **Status:** DONE
 
 **Commits:**
-- `31c2101` feat: add topic validation script for camera and IMU
+- `b13d75f` feat: add encoding dispatch table for mono8/bgr8/rgb8/YUV formats
 
 **Test summary:**
-- Script created at `scripts/validate_topics.py` and made executable (mode 100755).
-- Python syntax verified via `py_compile.compile(doraise=True)` -- compiles cleanly with no errors.
-- Live ROS2 smoke test not possible (no running topics in this environment), but the script is an exact transcription of the specification in the brief.
+- Syntax verified via `python3 -m py_compile scripts/validate_topics.py` -- compiles cleanly with no errors.
+- No existing test suite for this script; the task only required syntax verification.
+
+**What was implemented:**
+Replaced the mono8-only decode logic in `_on_image` (lines 68-78) with an encoding dispatch table supporting 5 raw encodings:
+
+| Encoding | Reshape | Conversion |
+|---|---|---|
+| `mono8` | `(H, W)` | none |
+| `bgr8` | `(H, W, 3)` | none (OpenCV native) |
+| `rgb8` | `(H, W, 3)` | `cv2.COLOR_RGB2BGR` |
+| `yuv422_yuy2` | `(H, W, 2)` | `cv2.COLOR_YUV2BGR_YUYV` |
+| `yuv422` | `(H, W, 2)` | `cv2.COLOR_YUV2BGR_UYVY` |
+| unknown fallback | `(H, W)` | mono8 interpreted, with warning |
+
+Minor improvements beyond spec: extracted `encoding` local variable, wrapped the encoding string in quotes in the warning message for readability.
 
 **Concerns:**
 - None.
-
----
-
-### Fix Report: Duration-expiry shutdown bug
-
-**Bug:** In `main()`, when `--duration` is set and the timer expires, the code set `running = False`. The `finally` block's `if running:` guard (`finally` block, line 191) then evaluated to `False` (because `running` was already set by the duration branch), so `shutdown()` was never called. This meant no summary statistics were printed for duration-based recordings.
-
-**Fix:** Replaced `running = False` with a direct `shutdown()` call followed by `break` in the duration-expiry branch of `main()` (line 186). `shutdown()` sets `running = False` internally, prints the summary, destroys the node, and shuts down rclpy. The `break` exits the while loop, and the `finally` block's guard correctly skips the duplicate shutdown call.

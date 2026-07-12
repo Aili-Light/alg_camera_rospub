@@ -134,9 +134,41 @@ def _print_sync_report(image_timestamps_ns, imu_timestamps_ns):
     print(f'  median/std:         {np.median(offsets):.1f} / '
           f'{offsets.std():.1f} ms')
 
+    # ASCII histogram (20 bins)
+    counts, bin_edges = np.histogram(offsets, bins=20)
+    max_count = counts.max()
+    bar_width = 60 if max_count > 0 else 1
+
+    print(f'\nOffset histogram (ms):')
+    for i in range(len(counts)):
+        if counts[i] == 0:
+            continue
+        bar_len = int(counts[i] / max_count * bar_width)
+        pct = counts[i] / len(offsets) * 100.0
+        bar = '#' * bar_len
+        print(f'  {bin_edges[i]:5.1f} - '
+              f'{bin_edges[i+1]:5.1f} | {bar:<{bar_width}} '
+              f'{counts[i]:>5} ({pct:5.1f}%)')
+
+
+def _write_timestamp_files(image_timestamps_ns, imu_timestamps_ns,
+                           output_dir):
+    """Save raw timestamps to text files (one ns integer per line, no header)."""
+    filepath = os.path.join(output_dir, 'image_timestamps.txt')
+    with open(filepath, 'w') as f:
+        for ts in image_timestamps_ns:
+            f.write(f'{ts}\n')
+    print(f'Image timestamps saved to: {filepath}')
+
+    filepath = os.path.join(output_dir, 'imu_timestamps.txt')
+    with open(filepath, 'w') as f:
+        for ts in imu_timestamps_ns:
+            f.write(f'{ts}\n')
+    print(f'IMU timestamps saved to: {filepath}')
+
 
 def _print_check_report(image_timestamps_ns, imu_timestamps_ns,
-                        camera_topic, imu_topic):
+                        camera_topic, imu_topic, output_dir):
     """Print the full timestamp consistency report."""
     print()
     print('=' * 60)
@@ -149,6 +181,11 @@ def _print_check_report(image_timestamps_ns, imu_timestamps_ns,
                            imu_timestamps_ns)
 
     _print_sync_report(image_timestamps_ns, imu_timestamps_ns)
+
+    if output_dir is not None:
+        print()
+        _write_timestamp_files(image_timestamps_ns, imu_timestamps_ns,
+                               output_dir)
 
     print()
     print('=' * 60)
@@ -225,8 +262,14 @@ def main():
 
         print(f'Done. {img_count} images, {imu_count} IMU samples.')
 
+        # Create timestamped output directory for timestamp files
+        timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+        check_output_dir = os.path.join(args.output_dir, timestamp_str)
+        os.makedirs(check_output_dir, exist_ok=True)
+
         _print_check_report(image_timestamps_ns, imu_timestamps_ns,
-                           args.camera_topic, args.imu_topic)
+                           args.camera_topic, args.imu_topic,
+                           check_output_dir)
         return 0
 
     # --- Normal mode: decode and save (existing code) ---

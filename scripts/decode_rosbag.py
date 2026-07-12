@@ -20,11 +20,6 @@ from rclpy.serialization import deserialize_message
 from sensor_msgs.msg import CompressedImage, Imu
 
 
-def _stamp_to_ns(msg):
-    """Extract nanosecond timestamp from message header."""
-    return msg.header.stamp.nanosec + msg.header.stamp.sec * 1_000_000_000
-
-
 def _print_stream_stats(timestamps, count, label):
     """Print statistics for a single stream (same format as validate_topics.py)."""
     if count == 0:
@@ -34,19 +29,23 @@ def _print_stream_stats(timestamps, count, label):
     total_time = timestamps[-1] - timestamps[0]
     actual_rate = (count - 1) / total_time if total_time > 0 else 0.0
 
-    intervals = np.diff(timestamps) * 1000.0  # convert to ms
-
-    print(f'Total frames:      {count}')
-    print(f'Actual rate:       {actual_rate:.1f} Hz')
-    print(f'Interval min/mean/max: '
-          f'{intervals.min():.1f} / {intervals.mean():.1f} / '
-          f'{intervals.max():.1f} ms')
+    if count > 1:
+        intervals = np.diff(timestamps) * 1000.0  # convert to ms
+        print(f'Total frames:      {count}')
+        print(f'Actual rate:       {actual_rate:.1f} Hz')
+        print(f'Interval min/mean/max: '
+              f'{intervals.min():.1f} / {intervals.mean():.1f} / '
+              f'{intervals.max():.1f} ms')
+    else:
+        print(f'Total frames:      {count}')
+        print(f'Actual rate:       N/A (only 1 sample)')
+        print(f'Interval min/mean/max: N/A (only 1 sample)')
     print(f'First stamp:       {timestamps[0]:.3f}')
     print(f'Last stamp:        {timestamps[-1]:.3f}')
     print(f'Total duration:    {total_time:.1f} s')
 
 
-def print_summary(image_timestamps, img_count, imu_timestamps, imu_count,
+def _print_summary(image_timestamps, img_count, imu_timestamps, imu_count,
                   imu_file, output_dir):
     """Print statistics and close IMU file."""
     # Close IMU text file if open
@@ -154,6 +153,12 @@ def main():
                   f'size={arr.shape[1]}x{arr.shape[0]} compressed')
 
         elif topic_name == args.imu_topic:
+            msg_type = topic_type_map.get(topic_name, '')
+            if 'Imu' not in msg_type:
+                print(f'Warning: unexpected type {msg_type} '
+                      f'on topic {topic_name}, skipping', file=sys.stderr)
+                continue
+
             msg = deserialize_message(raw_msg, Imu)
             imu_count += 1
             stamp_sec = stamp_ns / 1e9
@@ -186,7 +191,7 @@ def main():
             print(f'Warning: skipping unknown topic "{topic_name}"', file=sys.stderr)
 
     # Print summary
-    print_summary(image_timestamps, img_count, imu_timestamps, imu_count,
+    _print_summary(image_timestamps, img_count, imu_timestamps, imu_count,
                   imu_file, output_dir)
     return 0
 

@@ -19,7 +19,6 @@ include_directories(src)   # for C HAL headers
 add_library(v4l2_capture STATIC
   src/v4l2_capture.cpp
   src/clock_offset.cpp
-  src/rectification.cpp
 )
 target_compile_features(v4l2_capture PUBLIC cxx_std_17)
 target_compile_options(v4l2_capture PRIVATE -fPIC)

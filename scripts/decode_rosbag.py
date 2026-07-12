@@ -67,6 +67,93 @@ def _print_summary(image_timestamps, img_count, imu_timestamps, imu_count,
     print('=' * 60)
 
 
+def _print_interval_report(name, topic_name, timestamps_ns):
+    """Print intra-topic interval consistency for one stream."""
+    count = len(timestamps_ns)
+    if count < 2:
+        print(f'\n{name} ({topic_name}):')
+        print(f'  Count:              {count}')
+        print(f'  Not enough data for interval analysis (need >= 2).')
+        return
+
+    intervals_ms = np.diff(timestamps_ns) / 1e6  # ns -> ms
+    mean_interval_ms = intervals_ms.mean()
+    expected_hz = 1000.0 / mean_interval_ms if mean_interval_ms > 0 else 0.0
+    median_interval_ms = np.median(intervals_ms)
+    std_interval_ms = intervals_ms.std()
+
+    print(f'\n{name} ({topic_name}):')
+    print(f'  Count:              {count}')
+    print(f'  Mean interval:      {mean_interval_ms:.2f} ms  '
+          f'(expected {expected_hz:.0f} Hz)')
+    print(f'  Interval stats:')
+    print(f'    min/mean/max:     {intervals_ms.min():.1f} / '
+          f'{mean_interval_ms:.1f} / {intervals_ms.max():.1f} ms')
+    print(f'    median/std:       {median_interval_ms:.1f} / '
+          f'{std_interval_ms:.1f} ms')
+
+    # Distribution: % within 1%, 5%, 10% of mean
+    for pct in [1, 5, 10]:
+        threshold = pct / 100.0
+        within = np.sum(
+            np.abs(intervals_ms - mean_interval_ms) / mean_interval_ms
+            <= threshold)
+        pct_total = within / len(intervals_ms) * 100.0
+        print(f'  Within ±{pct:2d}% of mean:  '
+              f'{pct_total:5.1f}%  ({within} / {len(intervals_ms)})')
+
+
+def _print_sync_report(image_timestamps_ns, imu_timestamps_ns):
+    """Print cross-topic image-to-nearest-IMU offset statistics."""
+    if len(image_timestamps_ns) == 0:
+        print('\nNo image data for synchronization analysis.')
+        return
+    if len(imu_timestamps_ns) == 0:
+        print('\nNo IMU data for synchronization analysis.')
+        return
+
+    imu_array = np.array(imu_timestamps_ns)
+    offsets_ms = []
+    for t_img in image_timestamps_ns:
+        idx = np.searchsorted(imu_array, t_img)
+        # Check nearest neighbor (idx-1 and idx, clamped to bounds)
+        candidates = []
+        if idx > 0:
+            candidates.append(abs(t_img - imu_array[idx - 1]))
+        if idx < len(imu_array):
+            candidates.append(abs(t_img - imu_array[idx]))
+        offset_ns = min(candidates)
+        offsets_ms.append(offset_ns / 1e6)
+
+    offsets = np.array(offsets_ms)
+    print(f'\n=== Cross-Topic Synchronization ===')
+    print(f'\nImage-to-nearest-IMU offset:')
+    print(f'  Count:              {len(offsets)}')
+    print(f'  min/mean/max:       {offsets.min():.1f} / '
+          f'{offsets.mean():.1f} / {offsets.max():.1f} ms')
+    print(f'  median/std:         {np.median(offsets):.1f} / '
+          f'{offsets.std():.1f} ms')
+
+
+def _print_check_report(image_timestamps_ns, imu_timestamps_ns,
+                        camera_topic, imu_topic):
+    """Print the full timestamp consistency report."""
+    print()
+    print('=' * 60)
+    print('=== Timestamp Consistency Report ===')
+
+    print('\n=== Intra-Topic Interval Consistency ===')
+    _print_interval_report('Image stream', camera_topic,
+                           image_timestamps_ns)
+    _print_interval_report('IMU stream', imu_topic,
+                           imu_timestamps_ns)
+
+    _print_sync_report(image_timestamps_ns, imu_timestamps_ns)
+
+    print()
+    print('=' * 60)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Decode a ROS2 rosbag: extract images and IMU data')
@@ -84,6 +171,9 @@ def main():
     parser.add_argument(
         '--imu-topic', default='/imu/data',
         help='IMU topic name in the bag (default: /imu/data)')
+    parser.add_argument(
+        '--check-only', action='store_true', default=False,
+        help='Validate timestamps only; do not save data')
     args = parser.parse_args()
 
     # Validate bag directory
@@ -118,6 +208,43 @@ def main():
         topic_type_map[topic_meta.name] = topic_meta.type
 
     print(f'Bag contains topics: {topic_type_map}')
+
+    if args.check_only:
+        # --- Check-only mode: collect timestamps, print report ---
+        image_timestamps_ns = []
+        imu_timestamps_ns = []
+
+        print('Reading messages (check-only mode)...')
+        while reader.has_next():
+            (topic_name, raw_msg, stamp_ns) = reader.read_next()
+
+            if topic_name == args.camera_topic:
+                image_timestamps_ns.append(stamp_ns)
+                img_count += 1
+                if img_count % 100 == 0:
+                    print(f'  ... {img_count} images, '
+                          f'{imu_count} IMU samples')
+
+            elif topic_name == args.imu_topic:
+                imu_timestamps_ns.append(stamp_ns)
+                imu_count += 1
+                if imu_count % 2000 == 0:
+                    print(f'  ... {img_count} images, '
+                          f'{imu_count} IMU samples')
+
+        print(f'Done. {img_count} images, {imu_count} IMU samples.')
+
+        _print_check_report(image_timestamps_ns, imu_timestamps_ns,
+                           args.camera_topic, args.imu_topic)
+        return 0
+
+    # --- Normal mode: decode and save (existing code) ---
+    # State
+    image_timestamps = []
+    imu_timestamps = []
+    img_count = 0
+    imu_count = 0
+    imu_file = None
 
     # Read loop
     while reader.has_next():

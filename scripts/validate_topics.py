@@ -37,6 +37,9 @@ class TopicRecorder(Node):
         self.img_count = 0
         self.imu_count = 0
 
+        # IMU text file output (opened on first message)
+        self.imu_file = None
+
         # QoS: best-effort for images (large data), reliable for IMU
         best_effort = QoSProfile(
             depth=10,
@@ -158,7 +161,7 @@ class TopicRecorder(Node):
               f'size={arr.shape[1]}x{arr.shape[0]} compressed')
 
     def _on_imu(self, msg: Imu):
-        """Record IMU sample and print summary."""
+        """Record IMU sample, print summary, and append to text file."""
         self.imu_count += 1
         stamp_ns = msg.header.stamp.nanosec + msg.header.stamp.sec * 1_000_000_000
         stamp_sec = stamp_ns / 1e9
@@ -171,12 +174,32 @@ class TopicRecorder(Node):
         gy = msg.angular_velocity.y
         gz = msg.angular_velocity.z
 
+        # Open IMU text file on first message
+        if self.imu_file is None:
+            filepath = os.path.join(self.output_dir, 'imu_data.txt')
+            self.imu_file = open(filepath, 'w')
+            self.imu_file.write(
+                '# timestamp_ns gx gy gz ax ay az\n')
+
+        # Append one space-delimited line: ts_ns gx gy gz ax ay az
+        self.imu_file.write(
+            f'{stamp_ns} {gx:.4f} {gy:.4f} {gz:.4f} '
+            f'{ax:.4f} {ay:.4f} {az:.4f}\n')
+        self.imu_file.flush()
+
         print(f'[IMU #{self.imu_count:04d}] stamp={stamp_sec:.3f} '
               f'accel=({ax:.2f},{ay:.2f},{az:.2f}) '
               f'gyro=({gx:.2f},{gy:.2f},{gz:.2f})')
 
     def print_summary(self):
         """Compute and print statistics for both streams."""
+        # Close IMU text file if open
+        if self.imu_file is not None:
+            self.imu_file.close()
+            self.imu_file = None
+            imu_path = os.path.join(self.output_dir, 'imu_data.txt')
+            print(f'\nIMU data saved to: {imu_path}')
+
         print()
         print('=' * 60)
         print('=== Image Statistics ===')

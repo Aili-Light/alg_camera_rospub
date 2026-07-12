@@ -113,41 +113,81 @@ def _print_sync_report(image_timestamps_ns, imu_timestamps_ns):
         return
 
     imu_array = np.array(imu_timestamps_ns)
-    offsets_ms = []
+    offsets_ms = []       # absolute offset
+    signed_offsets_ms = []  # signed offset: positive = IMU after image
     for t_img in image_timestamps_ns:
         idx = np.searchsorted(imu_array, t_img)
         # Check nearest neighbor (idx-1 and idx, clamped to bounds)
-        candidates = []
+        candidate_idxs = []
         if idx > 0:
-            candidates.append(abs(t_img - imu_array[idx - 1]))
+            candidate_idxs.append(idx - 1)
         if idx < len(imu_array):
-            candidates.append(abs(t_img - imu_array[idx]))
-        offset_ns = min(candidates)
-        offsets_ms.append(offset_ns / 1e6)
+            candidate_idxs.append(idx)
+        best_idx = min(candidate_idxs,
+                       key=lambda i: abs(t_img - imu_array[i]))
+        offset_ns = imu_array[best_idx] - t_img  # signed: positive = IMU after image
+        signed_offsets_ms.append(offset_ns / 1e6)
+        offsets_ms.append(abs(offset_ns) / 1e6)
 
     offsets = np.array(offsets_ms)
-    print(f'\n=== Cross-Topic Synchronization ===')
-    print(f'\nImage-to-nearest-IMU offset:')
-    print(f'  Count:              {len(offsets)}')
-    print(f'  min/mean/max:       {offsets.min():.1f} / '
-          f'{offsets.mean():.1f} / {offsets.max():.1f} ms')
-    print(f'  median/std:         {np.median(offsets):.1f} / '
-          f'{offsets.std():.1f} ms')
+    signed = np.array(signed_offsets_ms)
 
-    # ASCII histogram (20 bins)
-    counts, bin_edges = np.histogram(offsets, bins=20)
+    print(f'\n=== Cross-Topic Synchronization ===')
+
+    # --- Absolute offset summary ---
+    print(f'\nAbsolute Image-to-nearest-IMU offset:')
+    print(f'  Count:              {len(offsets)}')
+    print(f'  min / mean / max:   {offsets.min():.2f} / '
+          f'{offsets.mean():.2f} / {offsets.max():.2f} ms')
+    print(f'  median / std:       {np.median(offsets):.2f} / '
+          f'{offsets.std():.2f} ms')
+
+    # --- Signed offset summary (directional bias) ---
+    imu_after = np.sum(signed > 0)
+    imu_before = np.sum(signed < 0)
+    exact = np.sum(signed == 0)
+    print(f'\nDirectional bias (signed offset, + = IMU after image):')
+    print(f'  IMU after image:    {imu_after} ({imu_after / len(signed) * 100:.1f}%)')
+    print(f'  IMU before image:   {imu_before} ({imu_before / len(signed) * 100:.1f}%)')
+    print(f'  Exact match:        {exact} ({exact / len(signed) * 100:.1f}%)')
+    print(f'  Signed mean:        {signed.mean():+.2f} ms')
+    print(f'  Signed median:      {np.median(signed):+.2f} ms')
+    print(f'  Signed range:       [{signed.min():+.2f}, {signed.max():+.2f}] ms')
+
+    # --- Percentile distribution ---
+    percentiles = [50, 75, 90, 95, 99, 99.9]
+    pct_values = np.percentile(offsets, percentiles)
+    print(f'\nAbsolute offset percentiles:')
+    for p, v in zip(percentiles, pct_values):
+        print(f'  P{p:5.1f}:            {v:.2f} ms')
+
+    # --- Coverage summary: cumulative fraction within key thresholds ---
+    thresholds_ms = [0.1, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0]
+    print(f'\nCumulative coverage (absolute offset):')
+    for t in thresholds_ms:
+        if t > offsets.max():
+            break
+        pct = np.sum(offsets <= t) / len(offsets) * 100.0
+        print(f'  ≤ {t:5.1f} ms:         {pct:5.1f}%')
+
+    # --- Signed offset ASCII histogram ---
+    signed_min = signed.min()
+    signed_max = signed.max()
+    # Use evenly-spaced bins across the signed range
+    n_bins = 20
+    counts, bin_edges = np.histogram(signed, bins=n_bins)
     max_count = counts.max()
     bar_width = 60 if max_count > 0 else 1
 
-    print(f'\nOffset histogram (ms):')
+    print(f'\nSigned offset histogram (ms) [+ = IMU after image]:')
     for i in range(len(counts)):
         if counts[i] == 0:
             continue
         bar_len = int(counts[i] / max_count * bar_width)
-        pct = counts[i] / len(offsets) * 100.0
+        pct = counts[i] / len(signed) * 100.0
         bar = '#' * bar_len
-        print(f'  {bin_edges[i]:5.1f} - '
-              f'{bin_edges[i+1]:5.1f} | {bar:<{bar_width}} '
+        print(f'  {bin_edges[i]:+7.2f} - '
+              f'{bin_edges[i+1]:+7.2f} | {bar:<{bar_width}} '
               f'{counts[i]:>5} ({pct:5.1f}%)')
 
 

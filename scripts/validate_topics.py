@@ -93,7 +93,7 @@ class TopicRecorder(Node):
             f'Camera topic "{camera_topic}" not found after {max_retries} retries')
 
     def _on_image(self, msg: Image):
-        """Decode mono8 image, save as JPEG, record timestamp."""
+        """Decode raw image (multi-encoding), save as JPEG, record timestamp."""
         self.img_count += 1
         stamp_ns = msg.header.stamp.nanosec + msg.header.stamp.sec * 1_000_000_000
         stamp_sec = stamp_ns / 1e9
@@ -126,15 +126,8 @@ class TopicRecorder(Node):
             self.get_logger().warn(
                 f'Unexpected encoding "{encoding}", treating as mono8')
 
-        # Save as JPEG
-        filename = f'image_{self.img_count:04d}_{stamp_ns}.jpg'
-        filepath = os.path.join(self.output_dir, filename)
-        cv2.imwrite(filepath, arr)
-        # cv2.imwrite expects BGR for 3-channel, but for single-channel
-        # it writes grayscale JPEG correctly.
-
-        print(f'[IMG #{self.img_count:04d}] stamp={stamp_sec:.3f} '
-              f'size={msg.width}x{msg.height}')
+        self._save_image(arr, stamp_ns, stamp_sec,
+                         f'size={msg.width}x{msg.height}')
 
     def _on_compressed_image(self, msg: CompressedImage):
         """Decode compressed JPEG image, save, record timestamp."""
@@ -152,13 +145,20 @@ class TopicRecorder(Node):
                 f'Failed to decode compressed image #{self.img_count}')
             return
 
-        # Save as JPEG (re-encode — preserves original quality)
+        self._save_image(arr, stamp_ns, stamp_sec,
+                         f'size={arr.shape[1]}x{arr.shape[0]} compressed')
+
+    def _save_image(self, arr: np.ndarray, stamp_ns: int,
+                    stamp_sec: float, label: str):
+        """Write numpy array as JPEG and print status line."""
         filename = f'image_{self.img_count:04d}_{stamp_ns}.jpg'
         filepath = os.path.join(self.output_dir, filename)
         cv2.imwrite(filepath, arr)
+        # cv2.imwrite expects BGR for 3-channel, but for single-channel
+        # it writes grayscale JPEG correctly.
 
         print(f'[IMG #{self.img_count:04d}] stamp={stamp_sec:.3f} '
-              f'size={arr.shape[1]}x{arr.shape[0]} compressed')
+              f'{label}')
 
     def _on_imu(self, msg: Imu):
         """Record IMU sample, print summary, and append to text file."""

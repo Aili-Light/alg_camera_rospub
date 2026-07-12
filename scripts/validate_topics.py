@@ -59,7 +59,6 @@ class TopicRecorder(Node):
 
     def _resolve_camera_subscription(self, camera_topic: str, qos: QoSProfile):
         """Inspect topic type and subscribe to Image or CompressedImage."""
-        import time as _time
         max_retries = 5
         for attempt in range(max_retries):
             topics_and_types = self.get_topic_names_and_types()
@@ -80,12 +79,13 @@ class TopicRecorder(Node):
                         Image, camera_topic, self._on_image, qos)
                     return
                 else:
-                    self.get_logger().warn(
-                        f'Topic {camera_topic} has unexpected type(s): {type_list}')
+                    raise RuntimeError(
+                        f'Topic {camera_topic} has unexpected type(s): {type_list}. '
+                        f'Expected sensor_msgs/msg/Image or sensor_msgs/msg/CompressedImage.')
             self.get_logger().warn(
                 f'Waiting for camera topic "{camera_topic}" '
                 f'(attempt {attempt + 1}/{max_retries})...')
-            _time.sleep(1.0)
+            time.sleep(1.0)
         raise RuntimeError(
             f'Camera topic "{camera_topic}" not found after {max_retries} retries')
 

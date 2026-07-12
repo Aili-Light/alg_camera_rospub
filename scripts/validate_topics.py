@@ -19,7 +19,7 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
-from sensor_msgs.msg import Image, Imu
+from sensor_msgs.msg import CompressedImage, Image, Imu
 
 
 class TopicRecorder(Node):
@@ -49,14 +49,45 @@ class TopicRecorder(Node):
         )
 
         # Subscriptions
-        self.img_sub = self.create_subscription(
-            Image, camera_topic, self._on_image, best_effort)
+        self._resolve_camera_subscription(camera_topic, best_effort)
         self.imu_sub = self.create_subscription(
             Imu, imu_topic, self._on_imu, reliable)
 
         self.get_logger().info(
             f'Recording started. Camera: {camera_topic}, IMU: {imu_topic}')
         self.get_logger().info(f'Saving to: {self.output_dir}')
+
+    def _resolve_camera_subscription(self, camera_topic: str, qos: QoSProfile):
+        """Inspect topic type and subscribe to Image or CompressedImage."""
+        import time as _time
+        max_retries = 5
+        for attempt in range(max_retries):
+            topics_and_types = self.get_topic_names_and_types()
+            topic_map = {name: types for name, types in topics_and_types}
+            if camera_topic in topic_map:
+                type_list = topic_map[camera_topic]
+                if 'sensor_msgs/msg/CompressedImage' in type_list:
+                    self.get_logger().info(
+                        f'Detected compressed image topic: {camera_topic}')
+                    self.img_sub = self.create_subscription(
+                        CompressedImage, camera_topic,
+                        self._on_compressed_image, qos)
+                    return
+                elif 'sensor_msgs/msg/Image' in type_list:
+                    self.get_logger().info(
+                        f'Detected raw image topic: {camera_topic}')
+                    self.img_sub = self.create_subscription(
+                        Image, camera_topic, self._on_image, qos)
+                    return
+                else:
+                    self.get_logger().warn(
+                        f'Topic {camera_topic} has unexpected type(s): {type_list}')
+            self.get_logger().warn(
+                f'Waiting for camera topic "{camera_topic}" '
+                f'(attempt {attempt + 1}/{max_retries})...')
+            _time.sleep(1.0)
+        raise RuntimeError(
+            f'Camera topic "{camera_topic}" not found after {max_retries} retries')
 
     def _on_image(self, msg: Image):
         """Decode mono8 image, save as JPEG, record timestamp."""
@@ -101,6 +132,30 @@ class TopicRecorder(Node):
 
         print(f'[IMG #{self.img_count:04d}] stamp={stamp_sec:.3f} '
               f'size={msg.width}x{msg.height}')
+
+    def _on_compressed_image(self, msg: CompressedImage):
+        """Decode compressed JPEG image, save, record timestamp."""
+        self.img_count += 1
+        stamp_ns = msg.header.stamp.nanosec + msg.header.stamp.sec * 1_000_000_000
+        stamp_sec = stamp_ns / 1e9
+        self.image_timestamps.append(stamp_sec)
+
+        # Decode JPEG bytes to numpy array
+        jpeg_bytes = np.frombuffer(msg.data, dtype=np.uint8)
+        arr = cv2.imdecode(jpeg_bytes, cv2.IMREAD_COLOR)
+
+        if arr is None:
+            self.get_logger().error(
+                f'Failed to decode compressed image #{self.img_count}')
+            return
+
+        # Save as JPEG (re-encode — preserves original quality)
+        filename = f'image_{self.img_count:04d}_{stamp_ns}.jpg'
+        filepath = os.path.join(self.output_dir, filename)
+        cv2.imwrite(filepath, arr)
+
+        print(f'[IMG #{self.img_count:04d}] stamp={stamp_sec:.3f} '
+              f'size={arr.shape[1]}x{arr.shape[0]} compressed')
 
     def _on_imu(self, msg: Imu):
         """Record IMU sample and print summary."""

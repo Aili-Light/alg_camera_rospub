@@ -244,17 +244,23 @@ def main():
 
         print('Reading messages (check-only mode)...')
         while reader.has_next():
-            (topic_name, raw_msg, stamp_ns) = reader.read_next()
+            (topic_name, raw_msg, _stamp_ns) = reader.read_next()
 
             if topic_name == args.camera_topic:
-                image_timestamps_ns.append(stamp_ns)
+                msg = deserialize_message(raw_msg, CompressedImage)
+                header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
+                                   + msg.header.stamp.nanosec)
+                image_timestamps_ns.append(header_stamp_ns)
                 img_count += 1
                 if img_count % 100 == 0:
                     print(f'  ... {img_count} images, '
                           f'{imu_count} IMU samples')
 
             elif topic_name == args.imu_topic:
-                imu_timestamps_ns.append(stamp_ns)
+                msg = deserialize_message(raw_msg, Imu)
+                header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
+                                   + msg.header.stamp.nanosec)
+                imu_timestamps_ns.append(header_stamp_ns)
                 imu_count += 1
                 if imu_count % 2000 == 0:
                     print(f'  ... {img_count} images, '
@@ -288,7 +294,7 @@ def main():
 
     # Read loop
     while reader.has_next():
-        (topic_name, raw_msg, stamp_ns) = reader.read_next()
+        (topic_name, raw_msg, _stamp_ns) = reader.read_next()
 
         if topic_name == args.camera_topic:
             msg_type = topic_type_map.get(topic_name, '')
@@ -299,7 +305,10 @@ def main():
 
             msg = deserialize_message(raw_msg, CompressedImage)
             img_count += 1
-            stamp_sec = stamp_ns / 1e9
+            # Use the sensor timestamp from the message header, not the bag-record time
+            header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
+                               + msg.header.stamp.nanosec)
+            stamp_sec = header_stamp_ns / 1e9
             image_timestamps.append(stamp_sec)
 
             # Decode JPEG bytes
@@ -312,7 +321,7 @@ def main():
                 continue
 
             # Save as JPEG
-            filename = f'image_{img_count:04d}_{stamp_ns}.jpg'
+            filename = f'image_{img_count:04d}_{header_stamp_ns}.jpg'
             filepath = os.path.join(output_dir, filename)
             cv2.imwrite(filepath, arr)
 
@@ -328,7 +337,10 @@ def main():
 
             msg = deserialize_message(raw_msg, Imu)
             imu_count += 1
-            stamp_sec = stamp_ns / 1e9
+            # Use the sensor timestamp from the message header, not the bag-record time
+            header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
+                               + msg.header.stamp.nanosec)
+            stamp_sec = header_stamp_ns / 1e9
             imu_timestamps.append(stamp_sec)
 
             ax = msg.linear_acceleration.x
@@ -346,7 +358,7 @@ def main():
 
             # Append one space-delimited line
             imu_file.write(
-                f'{stamp_ns} {gx:.4f} {gy:.4f} {gz:.4f} '
+                f'{header_stamp_ns} {gx:.4f} {gy:.4f} {gz:.4f} '
                 f'{ax:.4f} {ay:.4f} {az:.4f}\n')
             imu_file.flush()
 

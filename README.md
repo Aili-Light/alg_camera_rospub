@@ -42,7 +42,8 @@ ros2 launch alg_camera_rospub single_camera_with_imu.launch.py \
   fps:=30.0 \
   i2c_bus:=/dev/i2c-3 \
   imu_address:=105 \
-  imu_start_delay:=2.0
+  imu_start_delay:=2.0 \
+  imu_frequency:=200.0
 ```
 
 ### Stereo camera + IMU

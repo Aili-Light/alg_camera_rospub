@@ -65,16 +65,32 @@ class TopicRecorder(Node):
         stamp_sec = stamp_ns / 1e9
         self.image_timestamps.append(stamp_sec)
 
-        # Decode mono8 raw bytes to numpy array
-        if msg.encoding == 'mono8':
+        # Decode raw image bytes based on encoding
+        encoding = msg.encoding
+        if encoding == 'mono8':
             arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(
                 msg.height, msg.width)
+        elif encoding == 'bgr8':
+            arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(
+                msg.height, msg.width, 3)
+        elif encoding == 'rgb8':
+            arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(
+                msg.height, msg.width, 3)
+            arr = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
+        elif encoding == 'yuv422_yuy2':
+            arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(
+                msg.height, msg.width, 2)
+            arr = cv2.cvtColor(arr, cv2.COLOR_YUV2BGR_YUYV)
+        elif encoding == 'yuv422':
+            arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(
+                msg.height, msg.width, 2)
+            arr = cv2.cvtColor(arr, cv2.COLOR_YUV2BGR_UYVY)
         else:
-            # Fallback for other encodings — try to interpret as mono8
+            # Fallback for unrecognized encodings — try to interpret as mono8
             arr = np.frombuffer(msg.data, dtype=np.uint8).reshape(
                 msg.height, msg.width)
             self.get_logger().warn(
-                f'Unexpected encoding {msg.encoding}, treating as mono8')
+                f'Unexpected encoding "{encoding}", treating as mono8')
 
         # Save as JPEG
         filename = f'image_{self.img_count:04d}_{stamp_ns}.jpg'

@@ -114,16 +114,15 @@ struct StereoCameraNode::Impl
       throw;
     }
 
-    // --- Create publishers ---
-    left_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(left_topic_, 10);
-    right_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(right_topic_, 10);
-
-    // --- Optional compressed publishers ---
+    // --- Create publishers (only one mode) ---
     if (publish_compressed) {
       left_compressed_pub_ = node_->create_publisher<sensor_msgs::msg::CompressedImage>(
         left_topic_ + "/compressed", 10);
       right_compressed_pub_ = node_->create_publisher<sensor_msgs::msg::CompressedImage>(
         right_topic_ + "/compressed", 10);
+    } else {
+      left_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(left_topic_, 10);
+      right_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(right_topic_, 10);
     }
 
     // --- Log setup ---
@@ -181,20 +180,14 @@ struct StereoCameraNode::Impl
     const int64_t system_ns = clock_offset_.corrected_system_ns(monotonic_ns);
     const auto ros_time = rclcpp::Time(system_ns, RCL_SYSTEM_TIME);
 
-    sensor_msgs::msg::Image msg;
-    msg.header.stamp = ros_time;
-    msg.header.frame_id = frame_id;
-    copy_mat_to_image(*frame, msg);
-
-    const auto header = msg.header;
-    pub->publish(std::move(msg));
-
     if (comp_pub) {
+      // Compressed-only mode
       std::vector<int> jpeg_params = {cv::IMWRITE_JPEG_QUALITY, compressed_quality_};
       std::vector<uchar> jpeg_buf;
       if (cv::imencode(".jpg", *frame, jpeg_buf, jpeg_params)) {
         sensor_msgs::msg::CompressedImage comp_msg;
-        comp_msg.header = header;
+        comp_msg.header.stamp = ros_time;
+        comp_msg.header.frame_id = frame_id;
         comp_msg.format = "jpeg";
         comp_msg.data = std::move(jpeg_buf);
         comp_pub->publish(std::move(comp_msg));
@@ -202,6 +195,13 @@ struct StereoCameraNode::Impl
         RCLCPP_WARN_THROTTLE(node_->get_logger(), *node_->get_clock(), 5000,
           "Failed to encode compressed image");
       }
+    } else {
+      // Raw image mode
+      sensor_msgs::msg::Image msg;
+      msg.header.stamp = ros_time;
+      msg.header.frame_id = frame_id;
+      copy_mat_to_image(*frame, msg);
+      pub->publish(std::move(msg));
     }
   }
 

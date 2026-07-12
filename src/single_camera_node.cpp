@@ -77,8 +77,8 @@ struct SingleCameraNode::Impl
     const double fps = node_->declare_parameter<double>("fps", 60.0);
     const std::string topic = node_->declare_parameter<std::string>("topic_name", "/image");
     frame_id_ = node_->declare_parameter<std::string>("frame_id", "camera_link");
-    const bool output_color = node_->declare_parameter<bool>("output_color", false);
-    const bool publish_compressed = node_->declare_parameter<bool>("publish_compressed", false);
+    const bool output_color = node_->declare_parameter<bool>("output_color", true);
+    const bool publish_compressed = node_->declare_parameter<bool>("publish_compressed", true);
     const int compressed_quality = node_->declare_parameter<int>("compressed_quality", 80);
 
     // --- Configure and start V4L2 capture ---
@@ -95,13 +95,12 @@ struct SingleCameraNode::Impl
     capture_ = std::make_unique<V4L2Capture>(config);
     capture_->start();
 
-    // --- Create publisher ---
-    image_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(topic, 10);
-
-    // --- Optional compressed publisher ---
+    // --- Create publisher (only when NOT in compressed mode) ---
     if (publish_compressed) {
       compressed_pub_ = node_->create_publisher<sensor_msgs::msg::CompressedImage>(
         topic + "/compressed", 10);
+    } else {
+      image_pub_ = node_->create_publisher<sensor_msgs::msg::Image>(topic, 10);
     }
 
     // --- Log setup ---
@@ -154,21 +153,14 @@ struct SingleCameraNode::Impl
     const int64_t system_ns = clock_offset_.corrected_system_ns(monotonic_ns);
     const auto ros_time = rclcpp::Time(system_ns, RCL_SYSTEM_TIME);
 
-    sensor_msgs::msg::Image msg;
-    msg.header.stamp = ros_time;
-    msg.header.frame_id = frame_id_;
-    copy_mat_to_image(*frame, msg);
-
-    const auto header = msg.header;
-    image_pub_->publish(std::move(msg));
-
     if (compressed_pub_) {
-      // Encode to JPEG
+      // Compressed-only mode: publish JPEG, skip raw image
       std::vector<int> jpeg_params = {cv::IMWRITE_JPEG_QUALITY, compressed_quality_};
       std::vector<uchar> jpeg_buf;
       if (cv::imencode(".jpg", *frame, jpeg_buf, jpeg_params)) {
         sensor_msgs::msg::CompressedImage comp_msg;
-        comp_msg.header = header;
+        comp_msg.header.stamp = ros_time;
+        comp_msg.header.frame_id = frame_id_;
         comp_msg.format = "jpeg";
         comp_msg.data = std::move(jpeg_buf);
         compressed_pub_->publish(std::move(comp_msg));
@@ -176,6 +168,13 @@ struct SingleCameraNode::Impl
         RCLCPP_WARN_THROTTLE(node_->get_logger(), *node_->get_clock(), 5000,
           "Failed to encode compressed image");
       }
+    } else {
+      // Raw image mode
+      sensor_msgs::msg::Image msg;
+      msg.header.stamp = ros_time;
+      msg.header.frame_id = frame_id_;
+      copy_mat_to_image(*frame, msg);
+      image_pub_->publish(std::move(msg));
     }
   }
 

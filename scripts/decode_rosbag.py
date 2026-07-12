@@ -181,12 +181,6 @@ def main():
         print(f'Error: bag directory not found: {args.bag_dir}', file=sys.stderr)
         return 1
 
-    # Create timestamped output directory
-    timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
-    output_dir = os.path.join(args.output_dir, timestamp_str)
-    os.makedirs(output_dir, exist_ok=True)
-    print(f'Decoding to: {output_dir}')
-
     # Open the rosbag
     storage_options = StorageOptions(uri=args.bag_dir, storage_id='sqlite3')
     converter_options = ConverterOptions(
@@ -195,19 +189,16 @@ def main():
     reader = SequentialReader()
     reader.open(storage_options, converter_options)
 
-    # State
-    image_timestamps = []
-    imu_timestamps = []
-    img_count = 0
-    imu_count = 0
-    imu_file = None
-
     # Topic name → type map from bag metadata
     topic_type_map = {}
     for topic_meta in reader.get_all_topics_and_types():
         topic_type_map[topic_meta.name] = topic_meta.type
 
     print(f'Bag contains topics: {topic_type_map}')
+
+    # State (used by both modes)
+    img_count = 0
+    imu_count = 0
 
     if args.check_only:
         # --- Check-only mode: collect timestamps, print report ---
@@ -239,6 +230,12 @@ def main():
         return 0
 
     # --- Normal mode: decode and save (existing code) ---
+    # Create timestamped output directory
+    timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+    output_dir = os.path.join(args.output_dir, timestamp_str)
+    os.makedirs(output_dir, exist_ok=True)
+    print(f'Decoding to: {output_dir}')
+
     # State
     image_timestamps = []
     imu_timestamps = []

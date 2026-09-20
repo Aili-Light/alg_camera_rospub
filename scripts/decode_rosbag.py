@@ -1,23 +1,30 @@
 #!/usr/bin/env python3
 """
-Decode a ROS2 rosbag: extract compressed images as JPEG and IMU data as text.
+Decode a ROS2 rosbag (rosbag2 sqlite3 .db3): extract stereo images as JPEG
+and IMU data as text.
+
+Reads the .db3 file(s) directly (no metadata.yaml required), so it works on
+bags that only carry the sqlite3 storage file.
 
 Usage:
-    python3 decode_rosbag.py --bag-dir ./recordings/rosbag2_2026_07_12-04_25_53 \
-        --output-dir ./recordings --camera-topic /image/compressed \
+    python3 decode_rosbag.py --bag-dir /path/to/rosbag2_2026_09_20-07_55_08 \
+        --output-dir ./recordings \
+        --left-topic /image/left --right-topic /image/right \
         --imu-topic /imu/data
 """
 
 import argparse
+import glob
 import os
+import sqlite3
 import sys
 from datetime import datetime
+from pathlib import Path
 
 import cv2
 import numpy as np
-from rosbag2_py import ConverterOptions, SequentialReader, StorageOptions
 from rclpy.serialization import deserialize_message
-from sensor_msgs.msg import CompressedImage, Imu
+from sensor_msgs.msg import Image, Imu
 
 
 def _print_stream_stats(timestamps, count, label):
@@ -45,8 +52,8 @@ def _print_stream_stats(timestamps, count, label):
     print(f'Total duration:    {total_time:.1f} s')
 
 
-def _print_summary(image_timestamps, img_count, imu_timestamps, imu_count,
-                  imu_file, output_dir):
+def _print_summary(camera_streams, imu_timestamps, imu_count,
+                   imu_file, output_dir):
     """Print statistics and close IMU file."""
     # Close IMU text file if open
     if imu_file is not None:
@@ -56,10 +63,12 @@ def _print_summary(image_timestamps, img_count, imu_timestamps, imu_count,
 
     print()
     print('=' * 60)
-    print('=== Image Statistics ===')
-    _print_stream_stats(image_timestamps, img_count, 'image')
+    for stream in camera_streams:
+        print(f'=== {stream["name"].capitalize()} Image Statistics ===')
+        _print_stream_stats(stream['timestamps'], stream['count'],
+                            f'{stream["name"]} image')
+        print()
 
-    print()
     print('=== IMU Statistics ===')
     _print_stream_stats(imu_timestamps, imu_count, 'IMU')
 
@@ -103,10 +112,11 @@ def _print_interval_report(name, topic_name, timestamps_ns):
               f'{pct_total:5.1f}%  ({within} / {len(intervals_ms)})')
 
 
-def _print_sync_report(image_timestamps_ns, imu_timestamps_ns):
+def _print_sync_report(image_timestamps_ns, imu_timestamps_ns, name=''):
     """Print cross-topic image-to-nearest-IMU offset statistics."""
     if len(image_timestamps_ns) == 0:
-        print('\nNo image data for synchronization analysis.')
+        print(f'\nNo {name + " " if name else ""}image data '
+              f'for synchronization analysis.')
         return
     if len(imu_timestamps_ns) == 0:
         print('\nNo IMU data for synchronization analysis.')
@@ -132,7 +142,9 @@ def _print_sync_report(image_timestamps_ns, imu_timestamps_ns):
     offsets = np.array(offsets_ms)
     signed = np.array(signed_offsets_ms)
 
-    print(f'\n=== Cross-Topic Synchronization ===')
+    header = (f'\n=== Cross-Topic Synchronization ({name}) ==='
+              if name else f'\n=== Cross-Topic Synchronization ===')
+    print(header)
 
     # --- Absolute offset summary ---
     print(f'\nAbsolute Image-to-nearest-IMU offset:')
@@ -191,14 +203,15 @@ def _print_sync_report(image_timestamps_ns, imu_timestamps_ns):
               f'{counts[i]:>5} ({pct:5.1f}%)')
 
 
-def _write_timestamp_files(image_timestamps_ns, imu_timestamps_ns,
-                           output_dir):
+def _write_timestamp_files(camera_streams, imu_timestamps_ns, output_dir):
     """Save raw timestamps to text files (one ns integer per line, no header)."""
-    filepath = os.path.join(output_dir, 'image_timestamps.txt')
-    with open(filepath, 'w') as f:
-        for ts in image_timestamps_ns:
-            f.write(f'{ts}\n')
-    print(f'Image timestamps saved to: {filepath}')
+    for stream in camera_streams:
+        filepath = os.path.join(output_dir,
+                                f'{stream["name"]}_timestamps.txt')
+        with open(filepath, 'w') as f:
+            for ts in stream['timestamps_ns']:
+                f.write(f'{ts}\n')
+        print(f'{stream["name"].capitalize()} timestamps saved to: {filepath}')
 
     filepath = os.path.join(output_dir, 'imu_timestamps.txt')
     with open(filepath, 'w') as f:
@@ -207,44 +220,127 @@ def _write_timestamp_files(image_timestamps_ns, imu_timestamps_ns,
     print(f'IMU timestamps saved to: {filepath}')
 
 
-def _print_check_report(image_timestamps_ns, imu_timestamps_ns,
-                        camera_topic, imu_topic, output_dir):
+def _print_check_report(camera_streams, imu_timestamps_ns,
+                        imu_topic, output_dir):
     """Print the full timestamp consistency report."""
     print()
     print('=' * 60)
     print('=== Timestamp Consistency Report ===')
 
     print('\n=== Intra-Topic Interval Consistency ===')
-    _print_interval_report('Image stream', camera_topic,
-                           image_timestamps_ns)
-    _print_interval_report('IMU stream', imu_topic,
-                           imu_timestamps_ns)
+    for stream in camera_streams:
+        _print_interval_report(f'{stream["name"].capitalize()} image stream',
+                               stream['topic'], stream['timestamps_ns'])
+    _print_interval_report('IMU stream', imu_topic, imu_timestamps_ns)
 
-    _print_sync_report(image_timestamps_ns, imu_timestamps_ns)
+    for stream in camera_streams:
+        _print_sync_report(stream['timestamps_ns'], imu_timestamps_ns,
+                           name=stream['name'])
 
     if output_dir is not None:
         print()
-        _write_timestamp_files(image_timestamps_ns, imu_timestamps_ns,
-                               output_dir)
+        _write_timestamp_files(camera_streams, imu_timestamps_ns, output_dir)
 
     print()
     print('=' * 60)
 
 
+def _decode_image(msg):
+    """Convert a sensor_msgs/Image into a BGR numpy array for cv2.imwrite.
+
+    Returns None if the encoding is unsupported or the data is malformed.
+    """
+    if msg.is_bigendian:
+        print(f'[IMG] Warning: big-endian image not supported '
+              f'(encoding {msg.encoding}), skipping', file=sys.stderr)
+        return None
+
+    if msg.encoding in ('bgr8', '8UC3'):
+        channels = 3
+        convert = None
+    elif msg.encoding == 'rgb8':
+        channels = 3
+        convert = cv2.COLOR_RGB2BGR
+    elif msg.encoding in ('mono8', '8UC1'):
+        channels = 1
+        convert = None
+    else:
+        print(f'[IMG] Warning: unsupported encoding {msg.encoding}, '
+              f'skipping', file=sys.stderr)
+        return None
+
+    data = np.frombuffer(bytes(msg.data), dtype=np.uint8)
+    row_bytes = msg.width * channels
+    expected = row_bytes * msg.height
+    if data.size < expected:
+        print(f'[IMG] Warning: data too short for {msg.width}x{msg.height} '
+              f'({msg.encoding}): got {data.size} bytes, expected {expected}, '
+              f'skipping', file=sys.stderr)
+        return None
+
+    if msg.step == row_bytes:
+        arr = data[:expected].reshape(msg.height, msg.width, channels)
+    else:
+        # Row stride includes padding: copy each row's payload out.
+        arr = np.zeros((msg.height, msg.width, channels), dtype=np.uint8)
+        for y in range(msg.height):
+            row = data[y * msg.step:y * msg.step + row_bytes]
+            arr[y] = row.reshape(msg.width, channels)
+
+    if channels == 1:
+        arr = cv2.cvtColor(arr, cv2.COLOR_GRAY2BGR)
+    elif convert is not None:
+        arr = cv2.cvtColor(arr, convert)
+    return arr
+
+
+def _read_topic_type_map(bag_dir):
+    """Read topic name -> type across all .db3 files in the bag directory."""
+    topic_type_map = {}
+    for db3_path in sorted(glob.glob(os.path.join(bag_dir, '*.db3'))):
+        con = sqlite3.connect(f'{Path(db3_path).as_uri()}?mode=ro', uri=True)
+        try:
+            for name, typ in con.execute('SELECT name, type FROM topics'):
+                topic_type_map.setdefault(name, typ)
+        finally:
+            con.close()
+    return topic_type_map
+
+
+def _iter_messages(bag_dir):
+    """Yield (topic_name, topic_type, raw_data) across all .db3 files in order."""
+    for db3_path in sorted(glob.glob(os.path.join(bag_dir, '*.db3'))):
+        con = sqlite3.connect(f'{Path(db3_path).as_uri()}?mode=ro', uri=True)
+        try:
+            topic_map = {}
+            for tid, name, typ in con.execute(
+                    'SELECT id, name, type FROM topics'):
+                topic_map[tid] = (name, typ)
+
+            for tid, raw_data in con.execute(
+                    'SELECT topic_id, data FROM messages ORDER BY id'):
+                name, typ = topic_map.get(tid, ('', ''))
+                yield name, typ, raw_data
+        finally:
+            con.close()
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description='Decode a ROS2 rosbag: extract images and IMU data')
+        description='Decode a ROS2 rosbag: extract stereo images and IMU data')
     parser.add_argument(
-        '--bag-dir', default='./recordings/rosbag2_2026_07_12-04_25_53',
-        help='Path to rosbag directory (default: ./recordings/rosbag2_2026_07_12-04_25_53)')
+        '--bag-dir', required=True,
+        help='Path to rosbag directory (contains one or more .db3 files)')
     parser.add_argument(
         '--output-dir', default='./recordings',
         help='Parent output directory — timestamped subfolder created inside '
              '(default: ./recordings)')
     parser.add_argument(
-        '--camera-topic', default='/image/compressed',
-        help='Compressed image topic name in the bag '
-             '(default: /image/compressed)')
+        '--left-topic', default='/image/left',
+        help='Left image topic name in the bag (default: /image/left)')
+    parser.add_argument(
+        '--right-topic', default='/image/right',
+        help='Right image topic name in the bag (default: /image/right)')
     parser.add_argument(
         '--imu-topic', default='/imu/data',
         help='IMU topic name in the bag (default: /imu/data)')
@@ -257,161 +353,124 @@ def main():
     if not os.path.isdir(args.bag_dir):
         print(f'Error: bag directory not found: {args.bag_dir}', file=sys.stderr)
         return 1
+    if not glob.glob(os.path.join(args.bag_dir, '*.db3')):
+        print(f'Error: no .db3 file found in: {args.bag_dir}', file=sys.stderr)
+        return 1
 
-    # Open the rosbag
-    storage_options = StorageOptions(uri=args.bag_dir, storage_id='sqlite3')
-    converter_options = ConverterOptions(
-        input_serialization_format='cdr',
-        output_serialization_format='cdr')
-    reader = SequentialReader()
-    reader.open(storage_options, converter_options)
-
-    # Topic name → type map from bag metadata
-    topic_type_map = {}
-    for topic_meta in reader.get_all_topics_and_types():
-        topic_type_map[topic_meta.name] = topic_meta.type
-
+    # Topic name -> type map read directly from the sqlite3 storage
+    topic_type_map = _read_topic_type_map(args.bag_dir)
     print(f'Bag contains topics: {topic_type_map}')
 
-    # State (used by both modes)
-    img_count = 0
+    # Camera streams (left + right), keyed by topic for dispatch
+    camera_streams = []
+    topic_to_stream = {}
+    for name, topic in (('left', args.left_topic), ('right', args.right_topic)):
+        stream = {'name': name, 'topic': topic,
+                  'timestamps': [], 'timestamps_ns': [], 'count': 0}
+        camera_streams.append(stream)
+        topic_to_stream[topic] = stream
+
     imu_count = 0
+    imu_timestamps = []
+    imu_timestamps_ns = []
+    warned_topics = set()
 
-    if args.check_only:
-        # --- Check-only mode: collect timestamps, print report ---
-        image_timestamps_ns = []
-        imu_timestamps_ns = []
+    def _handle_image(stream, raw_msg):
+        stream['count'] += 1
+        msg = deserialize_message(raw_msg, Image)
+        # Use the sensor timestamp from the message header, not the bag-record time
+        header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
+                           + msg.header.stamp.nanosec)
+        stream['timestamps'].append(header_stamp_ns / 1e9)
+        stream['timestamps_ns'].append(header_stamp_ns)
 
-        print('Reading messages (check-only mode)...')
-        while reader.has_next():
-            (topic_name, raw_msg, _stamp_ns) = reader.read_next()
+        arr = _decode_image(msg)
+        if arr is None:
+            return
 
-            if topic_name == args.camera_topic:
-                msg = deserialize_message(raw_msg, CompressedImage)
-                header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
-                                   + msg.header.stamp.nanosec)
-                image_timestamps_ns.append(header_stamp_ns)
-                img_count += 1
-                if img_count % 100 == 0:
-                    print(f'  ... {img_count} images, '
-                          f'{imu_count} IMU samples')
+        filename = (f'{stream["name"]}_{stream["count"]:04d}_'
+                    f'{header_stamp_ns}.jpg')
+        cv2.imwrite(os.path.join(output_dir, filename), arr)
+        print(f'[{stream["name"].upper()} #{stream["count"]:04d}] '
+              f'stamp={header_stamp_ns / 1e9:.3f} '
+              f'size={arr.shape[1]}x{arr.shape[0]}')
 
-            elif topic_name == args.imu_topic:
-                msg = deserialize_message(raw_msg, Imu)
-                header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
-                                   + msg.header.stamp.nanosec)
-                imu_timestamps_ns.append(header_stamp_ns)
-                imu_count += 1
-                if imu_count % 2000 == 0:
-                    print(f'  ... {img_count} images, '
-                          f'{imu_count} IMU samples')
+    def _handle_imu(raw_msg):
+        nonlocal imu_count
+        imu_count += 1
+        msg = deserialize_message(raw_msg, Imu)
+        # Use the sensor timestamp from the message header, not the bag-record time
+        header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
+                           + msg.header.stamp.nanosec)
+        imu_timestamps.append(header_stamp_ns / 1e9)
+        imu_timestamps_ns.append(header_stamp_ns)
 
-        print(f'Done. {img_count} images, {imu_count} IMU samples.')
+        if args.check_only:
+            return
 
-        # Create timestamped output directory for timestamp files
-        timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
-        check_output_dir = os.path.join(args.output_dir, timestamp_str)
-        os.makedirs(check_output_dir, exist_ok=True)
+        ax = msg.linear_acceleration.x
+        ay = msg.linear_acceleration.y
+        az = msg.linear_acceleration.z
+        gx = msg.angular_velocity.x
+        gy = msg.angular_velocity.y
+        gz = msg.angular_velocity.z
 
-        _print_check_report(image_timestamps_ns, imu_timestamps_ns,
-                           args.camera_topic, args.imu_topic,
-                           check_output_dir)
-        return 0
+        # Open IMU text file on first message
+        if imu_file[0] is None:
+            filepath = os.path.join(output_dir, 'imu_data.txt')
+            imu_file[0] = open(filepath, 'w')
+            imu_file[0].write('# timestamp_ns gx gy gz ax ay az\n')
 
-    # --- Normal mode: decode and save (existing code) ---
-    # Create timestamped output directory
+        imu_file[0].write(
+            f'{header_stamp_ns} {gx:.4f} {gy:.4f} {gz:.4f} '
+            f'{ax:.4f} {ay:.4f} {az:.4f}\n')
+        imu_file[0].flush()
+
+        print(f'[IMU #{imu_count:04d}] stamp={header_stamp_ns / 1e9:.3f} '
+              f'accel=({ax:.2f},{ay:.2f},{az:.2f}) '
+              f'gyro=({gx:.2f},{gy:.2f},{gz:.2f})')
+
+    # Create timestamped output directory (used by both modes)
     timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
     output_dir = os.path.join(args.output_dir, timestamp_str)
     os.makedirs(output_dir, exist_ok=True)
-    print(f'Decoding to: {output_dir}')
 
-    # State
-    image_timestamps = []
-    imu_timestamps = []
-    img_count = 0
-    imu_count = 0
-    imu_file = None
+    if args.check_only:
+        print('Reading messages (check-only mode)...')
+    else:
+        print(f'Decoding to: {output_dir}')
 
-    # Read loop
-    while reader.has_next():
-        (topic_name, raw_msg, _stamp_ns) = reader.read_next()
+    imu_file = [None]  # mutable holder so the nested handler can set it
 
-        if topic_name == args.camera_topic:
-            msg_type = topic_type_map.get(topic_name, '')
-            if 'CompressedImage' not in msg_type:
+    for topic_name, msg_type, raw_msg in _iter_messages(args.bag_dir):
+        if topic_name in topic_to_stream:
+            if 'Image' not in msg_type:
                 print(f'Warning: unexpected type {msg_type} '
                       f'on topic {topic_name}, skipping', file=sys.stderr)
                 continue
-
-            msg = deserialize_message(raw_msg, CompressedImage)
-            img_count += 1
-            # Use the sensor timestamp from the message header, not the bag-record time
-            header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
-                               + msg.header.stamp.nanosec)
-            stamp_sec = header_stamp_ns / 1e9
-            image_timestamps.append(stamp_sec)
-
-            # Decode JPEG bytes
-            jpeg_bytes = np.frombuffer(msg.data, dtype=np.uint8)
-            arr = cv2.imdecode(jpeg_bytes, cv2.IMREAD_COLOR)
-
-            if arr is None:
-                print(f'[IMG #{img_count:04d}] ERROR: failed to decode '
-                      f'compressed image', file=sys.stderr)
-                continue
-
-            # Save as JPEG
-            filename = f'image_{img_count:04d}_{header_stamp_ns}.jpg'
-            filepath = os.path.join(output_dir, filename)
-            cv2.imwrite(filepath, arr)
-
-            print(f'[IMG #{img_count:04d}] stamp={stamp_sec:.3f} '
-                  f'size={arr.shape[1]}x{arr.shape[0]} compressed')
-
+            _handle_image(topic_to_stream[topic_name], raw_msg)
         elif topic_name == args.imu_topic:
-            msg_type = topic_type_map.get(topic_name, '')
             if 'Imu' not in msg_type:
                 print(f'Warning: unexpected type {msg_type} '
                       f'on topic {topic_name}, skipping', file=sys.stderr)
                 continue
-
-            msg = deserialize_message(raw_msg, Imu)
-            imu_count += 1
-            # Use the sensor timestamp from the message header, not the bag-record time
-            header_stamp_ns = (msg.header.stamp.sec * 1_000_000_000
-                               + msg.header.stamp.nanosec)
-            stamp_sec = header_stamp_ns / 1e9
-            imu_timestamps.append(stamp_sec)
-
-            ax = msg.linear_acceleration.x
-            ay = msg.linear_acceleration.y
-            az = msg.linear_acceleration.z
-            gx = msg.angular_velocity.x
-            gy = msg.angular_velocity.y
-            gz = msg.angular_velocity.z
-
-            # Open IMU text file on first message
-            if imu_file is None:
-                filepath = os.path.join(output_dir, 'imu_data.txt')
-                imu_file = open(filepath, 'w')
-                imu_file.write('# timestamp_ns gx gy gz ax ay az\n')
-
-            # Append one space-delimited line
-            imu_file.write(
-                f'{header_stamp_ns} {gx:.4f} {gy:.4f} {gz:.4f} '
-                f'{ax:.4f} {ay:.4f} {az:.4f}\n')
-            imu_file.flush()
-
-            print(f'[IMU #{imu_count:04d}] stamp={stamp_sec:.3f} '
-                  f'accel=({ax:.2f},{ay:.2f},{az:.2f}) '
-                  f'gyro=({gx:.2f},{gy:.2f},{gz:.2f})')
-
+            _handle_imu(raw_msg)
         else:
-            print(f'Warning: skipping unknown topic "{topic_name}"', file=sys.stderr)
+            if topic_name not in warned_topics:
+                print(f'Warning: skipping unknown topic "{topic_name}"',
+                      file=sys.stderr)
+                warned_topics.add(topic_name)
 
-    # Print summary
-    _print_summary(image_timestamps, img_count, imu_timestamps, imu_count,
-                  imu_file, output_dir)
+    if args.check_only:
+        per_camera = '; '.join(f'{s["name"]}: {s["count"]} images'
+                               for s in camera_streams)
+        print(f'Done. {per_camera}, {imu_count} IMU samples.')
+        _print_check_report(camera_streams, imu_timestamps_ns,
+                            args.imu_topic, output_dir)
+        return 0
+
+    _print_summary(camera_streams, imu_timestamps, imu_count,
+                   imu_file[0], output_dir)
     return 0
 
 

@@ -3,3 +3,7 @@ install/
 log/
 __pycache__/
 recordings/
+.claude/
+.superpower/
+.superpowers/
+docs/
